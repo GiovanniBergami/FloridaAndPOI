@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+dataset/florida_business_yelp.json
+dataset/florida_osm.json
+dataset/review_florida_reduced.json
