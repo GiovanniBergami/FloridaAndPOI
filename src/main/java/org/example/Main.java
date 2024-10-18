@@ -1,5 +1,9 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
@@ -14,6 +18,15 @@ public class Main {
             // Press Maiusc+F9 to start debugging your code. We have set one breakpoint
             // for you, but you can always add more by pressing Ctrl+F8.
             System.out.println("i = " + i);
+        }
+        String data;
+        try {
+            File osm = new File("dataset/florida_osm");
+            Scanner osm_reader = new Scanner(osm);
+            data = osm_reader.nextLine();
+            System.out.println(data);
+        } catch(FileNotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
 }
