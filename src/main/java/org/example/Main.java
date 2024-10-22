@@ -2,12 +2,18 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
 import java.util.Scanner;
+
+import connectors.neoConnector;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
 
 
 import com.mongodb.client.*;
 import connectors.mongoConnector;
 import org.bson.Document;
+import org.neo4j.driver.QueryConfig;
 
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
@@ -37,8 +43,12 @@ public class Main {
         mongoConnector prova = new mongoConnector("prova1","myCollection");
         prova.printCollection();
         prova.close();
-//        System.out.println("qui");
-//        System.out.println("collection "+collection.find().toString());
+
+
+
+        neoConnector.connect();
+
+
 
 
 
