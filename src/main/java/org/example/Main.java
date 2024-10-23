@@ -40,13 +40,19 @@ public class Main {
         } catch(FileNotFoundException e){
             System.out.println(e.getMessage());
         }
-        mongoConnector prova = new mongoConnector("prova1","myCollection");
-        prova.printCollection();
-        prova.close();
+
+        //DB TEST
+//        mongoConnector prova = new mongoConnector("prova1","myCollection");
+//        prova.printCollection();
+//        prova.close();
+//
+//
+//
+//        neoConnector.connect();
+        CLI.start();
 
 
 
-        neoConnector.connect();
 
 
 
