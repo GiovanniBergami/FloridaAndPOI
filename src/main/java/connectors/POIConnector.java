@@ -3,7 +3,7 @@ package connectors;
 import com.mongodb.client.*;
 import org.bson.Document;
 
-public class mongoConnector {
+public class POIConnector {
     static MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
     static MongoDatabase database =  mongoClient.getDatabase("LargeScaleProject");
     static MongoCollection<Document> users = database.getCollection("users");

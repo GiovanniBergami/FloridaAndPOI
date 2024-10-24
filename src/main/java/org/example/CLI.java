@@ -18,13 +18,13 @@ public class CLI {
 
         switch(activity){
             case "1":
-                System.out.println("è 1");
+                System.out.println("Insert POIs");
                 break;
             case "2":
-                System.out.println("è 2");
+                System.out.println("Insert Users");
                 break;
             case "3":
-                System.out.println("è 3");
+                System.out.println("Insert Reviews");
                 break;
         }
     }
