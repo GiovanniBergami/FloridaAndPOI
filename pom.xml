@@ -29,6 +29,11 @@
             <artifactId>neo4j-java-driver</artifactId>
             <version>5.26.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.27.1</version>
+        </dependency>
 
 
     </dependencies>

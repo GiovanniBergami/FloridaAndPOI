@@ -14,6 +14,8 @@ public class CLI {
 
         //parte iniziale per dividere tra unsigned user , user e admin, con autenticazione
 
+
+
         //cose messe ora per provare
         System.out.println("Insert POIs (1) / Insert Users (2) / Insert Reviews (3)");
 
@@ -37,3 +39,17 @@ public class CLI {
         }
     }
 }
+
+//Templates
+
+//switch(status){
+//        case "1":
+//
+//        break;
+//        case "2":
+//
+//        break;
+//        case "3":
+//
+//        break;
+//        }
