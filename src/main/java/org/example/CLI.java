@@ -2,6 +2,7 @@ package org.example;
 
 import mongoConnectors.POIConnector;
 import mongoConnectors.ReviewConnector;
+import mongoConnectors.UserConnector;
 
 import java.util.List;
 import java.util.Scanner;
@@ -37,7 +38,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Create","Remove","Update","Delete","Go back"),"admin> ");
+            int action = chooseBetween(List.of("Create","Remove","Update","Read","Go back"),"admin> ");
             switch(action){
                 case 1:
                     adminInsert();
@@ -49,7 +50,7 @@ public class CLI {
                     System.out.println("to do");
                     break;
                 case 4:
-                    System.out.println("to do");
+                    adminRead();
                     break;
                 case 5:
                     exit = true;
@@ -60,6 +61,63 @@ public class CLI {
         }
 
     }
+
+
+    public static void adminInsert(){
+        int activity = chooseBetween(List.of("Create POIs","Create Users","Create Reviews"," go back"),"admin/insert> ");
+
+        switch(activity){
+            case 1:
+                System.out.println("Insert POIs, specify path");
+                POIConnector.insertPOIs(scanner.nextLine()); //questo verrà eventualmente inserito da tastiera
+                POIConnector.count();
+                break;
+            case 2:
+                System.out.println("Insert Users");
+                int prova;
+                prova = scanner.nextInt();
+                System.out.println(prova);
+                break;
+            case 3:
+                System.out.println("Insert Reviews, specify path");
+                String path;
+                path = scanner.nextLine();
+                ReviewConnector.insertReviews(path);
+                ReviewConnector.count();
+                ReviewConnector.printCollection(3);
+                break;
+            case 4:
+                break;
+            default:
+                System.out.println("wrong input, retry");
+        }
+    }
+    public static void adminRead(){
+        int activity = chooseBetween(List.of("Read POIs","Read Users","Read Reviews"," go back"),"admin/insert> ");
+        System.out.println("how many?");
+        int n = scanner.nextInt();
+        scanner.nextLine(); //toglie il \n del nextInt
+        switch(activity){
+            case 1:
+                POIConnector.printCollection(n);
+                POIConnector.count();
+                break;
+            case 2:
+                UserConnector.printCollection(n);
+                UserConnector.count();
+                break;
+            case 3:
+                ReviewConnector.printCollection(n);
+                ReviewConnector.count();
+                break;
+            case 4:
+                break;
+            default:
+                System.out.println("wrong input, retry");
+        }
+
+    }
+
     public static void user(){
         boolean exit = false;
         while(!exit){
@@ -108,32 +166,7 @@ public class CLI {
         }
     }
 
-    public static void adminInsert(){
-        int activity = chooseBetween(List.of("Create POIs","Create Users","Create Reviews"," go back"),"admin/insert> ");
-        String path;
-        switch(activity){
-            case 1:
-                System.out.println("Insert POIs, specify path");
-                path = scanner.nextLine();
-                POIConnector.insertPOIs(path); //questo verrà eventualmente inserito da tastiera
-                POIConnector.count();
-                break;
-            case 2:
-                System.out.println("Insert Users");
-                break;
-            case 3:
-                System.out.println("Insert Reviews, specify path");
-                path = scanner.nextLine();
-                ReviewConnector.insertReviews(path);
-                ReviewConnector.count();
-                ReviewConnector.printCollection(3);
-                break;
-            case 4:
-                break;
-            default:
-                System.out.println("wrong input, retry");
-        }
-    }
+    // UTILITIES
 
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
@@ -141,9 +174,10 @@ public class CLI {
             System.out.println(" "+i+" - "+option);
             i++;
         }
-        System.out.print(prompt);
+        //System.out.print(prompt);
         int r = scanner.nextInt();
-        clearCLI();
+        scanner.nextLine(); //nextInt leaves a \n into the buffer, so other nextLine will pick up that instead of the actual value
+        //clearCLI();
         return r;
     }
     public static void clearCLI(){

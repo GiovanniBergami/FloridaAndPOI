@@ -3,14 +3,15 @@ package org.example;
 import mongoConnectors.mongoConnector;
 import neoConnectors.neoConnector;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
 
 //        neoConnector.connect();
         CLI.start();
         mongoConnector.close();
-
-
+        CLI.scanner.close();
     }
 }
 
