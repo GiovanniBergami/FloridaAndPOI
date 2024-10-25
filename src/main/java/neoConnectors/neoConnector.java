@@ -1,4 +1,4 @@
-package connectors;
+package neoConnectors;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;

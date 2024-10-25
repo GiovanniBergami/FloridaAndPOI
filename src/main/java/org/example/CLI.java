@@ -1,5 +1,8 @@
 package org.example;
 
+import mongoConnectors.POIConnector;
+import mongoConnectors.ReviewConnector;
+
 import java.util.Scanner;
 
 public class CLI {
@@ -19,12 +22,17 @@ public class CLI {
         switch(activity){
             case "1":
                 System.out.println("Insert POIs");
+                POIConnector.insertPOIs("dataset/florida_business_yelp.json"); //questo verrà eventualmente inserito da tastiera
+                POIConnector.count();
                 break;
             case "2":
                 System.out.println("Insert Users");
                 break;
             case "3":
                 System.out.println("Insert Reviews");
+                ReviewConnector.insertReviews("dataset/review_florida_reduced.json");
+                ReviewConnector.count();
+                ReviewConnector.printCollection(3);
                 break;
         }
     }
