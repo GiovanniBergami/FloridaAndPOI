@@ -69,7 +69,7 @@ public class CLI {
         switch(activity){
             case 1:
                 System.out.println("Insert POIs, specify path");
-                POIConnector.insertPOIs(scanner.nextLine()); //questo verrà eventualmente inserito da tastiera
+                POIConnector.insertPOIs(scanner.nextLine());
                 POIConnector.count();
                 break;
             case 2:
@@ -80,9 +80,7 @@ public class CLI {
                 break;
             case 3:
                 System.out.println("Insert Reviews, specify path");
-                String path;
-                path = scanner.nextLine();
-                ReviewConnector.insertReviews(path);
+                ReviewConnector.insertReviews(scanner.nextLine());
                 ReviewConnector.count();
                 ReviewConnector.printCollection(3);
                 break;

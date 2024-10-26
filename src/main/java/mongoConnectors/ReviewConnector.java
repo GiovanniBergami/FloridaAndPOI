@@ -46,8 +46,9 @@ public class ReviewConnector {
             while (fileReader.hasNextLine()) {
                 line = fileReader.nextLine();
                 doc = Document.parse(line);
-                reviews.insertOne(doc);
+                reviews.insertOne(doc);  //check if it gives errors. it shouldnt. if there are, delete it
             }
+            fileReader.close();
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }

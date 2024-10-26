@@ -32,6 +32,7 @@ public class POIConnector {
                 doc = Document.parse(line);
                 POIs.insertOne(doc);
             }
+            fileReader.close();  //check if it gives errors. it shouldnt. if there are, delete it
         } catch(FileNotFoundException e){
             System.out.println(e.getMessage());
         }
