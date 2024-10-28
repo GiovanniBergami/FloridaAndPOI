@@ -15,7 +15,7 @@ public class CLI {
         boolean exit = false;
         System.out.println("Starting...");
         while(!exit) {
-            System.out.println("Who are you?");
+            System.out.println("Who are you? -- FASE PROVVISORIA, SI PARTE DA UNSIGNED USER");
             int c = chooseBetween(List.of("Admin","User","Unsigned User","Stop"),"> ");
             switch (c) {
                 case 1:
@@ -133,7 +133,16 @@ public class CLI {
                     System.out.println("to do");
                     break;
                 case 4:
-                    System.out.println("to do");
+                    System.out.println("Insert POI name");
+                    String POIname = scanner.nextLine();
+                    Document doc = POIConnector.findPOI(POIname);
+                    if(doc.getString("name").equals("0")){
+                        System.out.println("POI not found");
+                    }else{
+                        System.out.println(doc.toJson());
+                    }
+
+                    //mettere successiva interazione per guardare le recensioni
                     break;
                 case 5:
                     exit = true;
@@ -147,7 +156,7 @@ public class CLI {
     public static void unsignedUser(){
         boolean exit = false;
         while(!exit){
-            System.out.println("Which action do you want to take?");
+            System.out.println("Hi Unsigned User, which action do you want to take?");
             int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Go back"),"unsignedUser> ");
             switch(action){
                 case 1:
@@ -171,7 +180,11 @@ public class CLI {
                     }
                     break;
                 case 4:
-                    System.out.println("to do");
+                    if(logIn(true)){
+                        admin();
+                    }else{
+                        System.out.println("Admin not found");
+                    }
                     break;
                 case 5:
                     exit = true;
