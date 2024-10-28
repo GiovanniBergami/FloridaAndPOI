@@ -33,7 +33,7 @@ public class ReviewConnector {
     }
     public static void count(){
         long count = reviews.countDocuments();
-        System.out.println("number of POIs: " + count);
+        System.out.println("number of reviews: " + count);
     }
     public static int insertReviews(String jsonPath) {
 

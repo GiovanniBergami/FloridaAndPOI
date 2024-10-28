@@ -41,3 +41,10 @@ dataset/florida_osm.json
 dataset/review_florida_reduced.json
 /dataset/cities.json
 /dataset/cities_with_linkage.json
+/dataset/prepared/dataset1/cities.json
+/dataset/prepared/dataset1/cities_with_linkage.json
+/dataset/prepared/dataset1/POIs_with_linkage.json
+/dataset/prepared/dataset1/user.json
+/dataset/user.json
+/dataset/prepared/dataset1/user_old.json
+/dataset/prepared/dataset1/README.txt

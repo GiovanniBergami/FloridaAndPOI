@@ -6,6 +6,7 @@ import mongoConnectors.UserConnector;
 
 import java.util.List;
 import java.util.Scanner;
+import org.bson.Document;
 
 public class CLI {
      static Scanner scanner = new Scanner(System.in);
@@ -147,15 +148,32 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Sign In","Search POI","Go back"),"unsignedUser> ");
+            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Go back"),"unsignedUser> ");
             switch(action){
                 case 1:
-                    System.out.println("todo");
+                    if(logIn(false)){
+                        user();
+                    }else{
+                        System.out.println("User not found");
+                    }
                     break;
                 case 2:
-                    System.out.println("to do");
+                    register();
                     break;
                 case 3:
+                    System.out.println("Insert POI name");
+                    String POIname = scanner.nextLine();
+                    Document doc = POIConnector.findPOI(POIname);
+                    if(doc.getString("name").equals("0")){
+                        System.out.println("POI not found");
+                    }else{
+                        System.out.println(doc.toJson());
+                    }
+                    break;
+                case 4:
+                    System.out.println("to do");
+                    break;
+                case 5:
                     exit = true;
                     break;
                 default:
@@ -165,7 +183,38 @@ public class CLI {
     }
 
     // UTILITIES
+    public static boolean logIn(boolean admin){
+        String username;
+        String password;
+        System.out.println("Insert username");
+        username = scanner.nextLine();
+        System.out.println("Insert password");
+        password = scanner.nextLine();
+        boolean esito = UserConnector.findUser(username,password,admin);
 
+        return esito;
+    }
+    public static boolean register(){
+        String username;
+        String password;
+        int age;
+        System.out.println("Insert username");
+        username = scanner.nextLine();
+        System.out.println("Insert password");
+        password = scanner.nextLine();
+        System.out.println("Insert age");
+        age = scanner.nextInt();
+        scanner.nextLine();
+        boolean esito = false;
+        if(!UserConnector.findUser(username,password,false)){
+            esito = UserConnector.createUser(username,password,age);
+        }else{
+            System.out.println("The user already exists");
+        }
+
+
+        return esito;
+    }
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
         for(String option : options){

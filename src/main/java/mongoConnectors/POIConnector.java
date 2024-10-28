@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+
 public class POIConnector {
     static MongoCollection<Document> POIs = mongoConnector.database.getCollection("POIs");
 
@@ -61,6 +64,17 @@ public class POIConnector {
                 i++;
             }
         }
+    }
+
+    public static Document findPOI(String name){
+        Document doc;
+        doc = POIs.find(eq("name", name)).first();
+
+        if(doc != null) {
+            return doc;
+        }
+        doc = new Document("name","0");
+        return doc;
     }
     //UPDATE
     //DELETE

@@ -23,3 +23,13 @@ db.cities.aggregate(
 $group : { _id: null , sommaq : { $sum : "$POI_count"}}
 })
 
+for ( const myUser of db.users.find()){
+    for ( const f of myUser.friends){
+        db.users.updateOne(
+            {user_id = f.user_id},
+            {$addToSet: {friends : myUser.user_id}}
+        )
+
+    }
+}
+
