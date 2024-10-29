@@ -7,6 +7,7 @@ import mongoConnectors.UserConnector;
 import java.util.List;
 import java.util.Scanner;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class CLI {
      static Scanner scanner = new Scanner(System.in);
@@ -121,10 +122,30 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Create Review","Update Profile","Delete Profile","Search POI","Go back"),"user> ");
+            int action = chooseBetween(List.of("Search POI","Update Profile","Delete Profile","Go back"),"user> ");
             switch(action){
                 case 1:
-                    System.out.println("todo");
+                    Document poi = findPOI();
+                    if(poi.getString("name").equals("0")){
+                        System.out.println("POI not found");
+                    }else{
+                        System.out.println(poi.toJson());
+                    }
+                    int c = chooseBetween(List.of("See reviews","Add review","Go back"),"user");
+                    switch(c){
+                        case 1:
+                            findReviews(poi);
+                            break;
+                        case 2:
+                            addReview(poi);
+                            break;
+                        case 3:
+                            break;
+                        default:
+                            System.out.println("wrong input, retry");
+                    }
+                    findReviews(poi);
+
                     break;
                 case 2:
                     System.out.println("to do");
@@ -133,11 +154,6 @@ public class CLI {
                     System.out.println("to do");
                     break;
                 case 4:
-                    if(!findPOIandReviews()){
-                        System.out.println("poi not found");
-                    }
-                    break;
-                case 5:
                     exit = true;
                     break;
                 default:
@@ -164,8 +180,11 @@ public class CLI {
                     register();
                     break;
                 case 3:
-                    if(!findPOI()){
+                    Document poi = findPOI();
+                    if(poi.getString("name").equals("0")){
                         System.out.println("POI not found");
+                    }else{
+                        System.out.println(poi.toJson());
                     }
                     break;
                 case 4:
@@ -186,53 +205,59 @@ public class CLI {
 
     // UTILITIES
 
-    public static boolean findPOI(){
+    public static Document findPOI(){
         System.out.println("Insert POI name");
         String POIname = scanner.nextLine();
         Document doc = POIConnector.findPOI(POIname);
-        if(doc.getString("name").equals("0")){
-            return false;
-        }else{
-            System.out.println(doc.toJson());
-            return true;
-        }
+        return doc;
     }
 
-    public static boolean findPOIandReviews(){
-        System.out.println("Insert POI name");
-        String POIname = scanner.nextLine();
-        Document doc = POIConnector.findPOI(POIname);
-        if(doc.getString("name").equals("0")){
-            return false;
-        }else{
-            System.out.println(doc.toJson());
-            Document review;
-            int reviewIndex = 0;
-            List<String> review_ids = doc.getList("review_ids", String.class);
+    public static boolean findReviews(Document poi){
 
-            while(true){
-                System.out.println("see other reviews?");
-                int c = chooseBetween(List.of("yes","no"),"user");
-                switch(c){
-                    case 1:
-                        for(int j = reviewIndex; j< reviewIndex+3 ;j++){
-                            review = ReviewConnector.getReview(review_ids.get(j));
-                            System.out.println(review.toJson());
-                            if(j == (review_ids.size()-1)){
-                                System.out.println("Reviews ended");
-                                return true;
-                            }
+        Document review;
+        int reviewIndex = 0;
+        List<String> review_ids = poi.getList("review_ids", String.class);
+        if(review_ids.size()==0)
+            return true;
+        while(true) {
+            System.out.println("see other reviews?");
+            int c = chooseBetween(List.of("yes", "no"), "user");
+            switch (c) {
+                case 1:
+                    for (int j = reviewIndex; j < reviewIndex + 3; j++) {
+                        review = ReviewConnector.getReview(review_ids.get(j));
+                        System.out.println(review.toJson());
+                        if (j == (review_ids.size() - 1)) {
+                            System.out.println("Reviews ended");
+                            return true;
                         }
-                        reviewIndex = reviewIndex +3;
-                        break;
-                    case 2:
-                        return true;
-                }
-
+                    }
+                    reviewIndex = reviewIndex + 3;
+                    break;
+                case 2:
+                    return true;
             }
 
         }
+
     }
+    public static boolean addReview(Document poi){
+        System.out.println("Insert Review data:");
+        System.out.println("insert your name");
+        String name = scanner.nextLine();
+        System.out.println("Stars");
+        int stars = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("date");
+        String date = scanner.nextLine();
+        System.out.println("text");
+        String text = scanner.nextLine();
+        ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
+        POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
+
+        return true;
+    }
+
 
     public static boolean logIn(boolean admin){
         String username;

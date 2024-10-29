@@ -70,4 +70,16 @@ public class ReviewConnector {
         return 0;
     }
 
+    public static org.bson.types.ObjectId insertReview(String username, String date, String text, int rating){
+
+        Document doc;
+        doc =  new Document("name",username)
+                        .append("date",date)
+                        .append("text",text)
+                        .append("stars",rating);
+        reviews.insertOne(doc);
+
+        return doc.getObjectId("_id");
+    }
+
 }

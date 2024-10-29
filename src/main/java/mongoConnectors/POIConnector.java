@@ -2,6 +2,7 @@ package mongoConnectors;
 
 import com.mongodb.client.*;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,6 +78,14 @@ public class POIConnector {
         return doc;
     }
     //UPDATE
+
+
+    public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
+        Document filter = new Document("_id",poi_id);
+        Document updateOperation = new Document("$push",new Document("review_ids",review_id));
+        POIs.updateOne(filter,updateOperation);
+        return true;
+    }
     //DELETE
 
 
