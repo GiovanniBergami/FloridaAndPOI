@@ -7,9 +7,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class ReviewConnector {
     static MongoCollection<Document> reviews = mongoConnector.database.getCollection("reviews");
-
+//READ
     public static void printCollection(){
 
         try (MongoCursor<Document> cursor = reviews.find().iterator())
@@ -35,6 +37,19 @@ public class ReviewConnector {
         long count = reviews.countDocuments();
         System.out.println("number of reviews: " + count);
     }
+
+
+    public static Document getReview(String id){
+        Document review = reviews.find(eq("review_id",id)).first();
+
+        if(review != null) {
+            return review;
+        }
+        review = new Document("name","0");
+        return review;
+
+    }
+    //CREATE
     public static int insertReviews(String jsonPath) {
 
         String line;
@@ -54,4 +69,5 @@ public class ReviewConnector {
         }
         return 0;
     }
+
 }

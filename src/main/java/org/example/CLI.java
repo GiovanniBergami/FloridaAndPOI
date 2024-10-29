@@ -133,16 +133,9 @@ public class CLI {
                     System.out.println("to do");
                     break;
                 case 4:
-                    System.out.println("Insert POI name");
-                    String POIname = scanner.nextLine();
-                    Document doc = POIConnector.findPOI(POIname);
-                    if(doc.getString("name").equals("0")){
-                        System.out.println("POI not found");
-                    }else{
-                        System.out.println(doc.toJson());
+                    if(!findPOIandReviews()){
+                        System.out.println("poi not found");
                     }
-
-                    //mettere successiva interazione per guardare le recensioni
                     break;
                 case 5:
                     exit = true;
@@ -153,6 +146,7 @@ public class CLI {
             }
         }
     }
+
     public static void unsignedUser(){
         boolean exit = false;
         while(!exit){
@@ -170,13 +164,8 @@ public class CLI {
                     register();
                     break;
                 case 3:
-                    System.out.println("Insert POI name");
-                    String POIname = scanner.nextLine();
-                    Document doc = POIConnector.findPOI(POIname);
-                    if(doc.getString("name").equals("0")){
+                    if(!findPOI()){
                         System.out.println("POI not found");
-                    }else{
-                        System.out.println(doc.toJson());
                     }
                     break;
                 case 4:
@@ -196,6 +185,51 @@ public class CLI {
     }
 
     // UTILITIES
+
+    public static boolean findPOI(){
+        System.out.println("Insert POI name");
+        String POIname = scanner.nextLine();
+        Document doc = POIConnector.findPOI(POIname);
+        if(doc.getString("name").equals("0")){
+            return false;
+        }else{
+            System.out.println(doc.toJson());
+            return true;
+        }
+    }
+
+    public static boolean findPOIandReviews(){
+        System.out.println("Insert POI name");
+        String POIname = scanner.nextLine();
+        Document doc = POIConnector.findPOI(POIname);
+        if(doc.getString("name").equals("0")){
+            return false;
+        }else{
+            System.out.println(doc.toJson());
+            Document review;
+            int reviewIndex = 0;
+            List<String> review_ids = doc.getList("review_ids", String.class);
+            boolean exit = false;
+            while(!exit){
+                System.out.println("see other reviews?");
+                int c = chooseBetween(List.of("yes","no"),"user");
+                switch(c){
+                    case 1:
+                        for(int j = reviewIndex; j< Math.min(review_ids.size(),reviewIndex+3);j++){
+                            review = ReviewConnector.getReview(review_ids.get(j));
+                        }
+                        reviewIndex = reviewIndex +3;
+                        break;
+                    case 2:
+                        exit = true;
+                        break;
+                }
+
+            }
+            return true;
+        }
+    }
+
     public static boolean logIn(boolean admin){
         String username;
         String password;
