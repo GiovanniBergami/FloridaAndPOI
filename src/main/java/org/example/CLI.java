@@ -209,24 +209,28 @@ public class CLI {
             Document review;
             int reviewIndex = 0;
             List<String> review_ids = doc.getList("review_ids", String.class);
-            boolean exit = false;
-            while(!exit){
+
+            while(true){
                 System.out.println("see other reviews?");
                 int c = chooseBetween(List.of("yes","no"),"user");
                 switch(c){
                     case 1:
-                        for(int j = reviewIndex; j< Math.min(review_ids.size(),reviewIndex+3);j++){
+                        for(int j = reviewIndex; j< reviewIndex+3 ;j++){
                             review = ReviewConnector.getReview(review_ids.get(j));
+                            System.out.println(review.toJson());
+                            if(j == (review_ids.size()-1)){
+                                System.out.println("Reviews ended");
+                                return true;
+                            }
                         }
                         reviewIndex = reviewIndex +3;
                         break;
                     case 2:
-                        exit = true;
-                        break;
+                        return true;
                 }
 
             }
-            return true;
+
         }
     }
 
