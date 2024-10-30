@@ -2,7 +2,9 @@ package mongoConnectors;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,7 +49,7 @@ public class UserConnector {
 
     //READ
 
-    public static boolean findUser(String username,String password,boolean admin){
+    public static Document findUser(String username,String password,boolean admin){
         Document doc;
         if(admin) {
             doc = users.find(and(eq("name", username), eq("password", password), eq("admin", 1))).first();
@@ -55,11 +57,10 @@ public class UserConnector {
             doc = users.find(and(eq("name", username), eq("password", password))).first();
         }
 
-        if(doc != null) {
-            System.out.println(doc.toJson());
-            return true;
+        if(doc == null) {
+            doc = new Document("name","0");
         }
-        return false;
+        return doc;
     }
     public static void printCollection(){
 
@@ -87,6 +88,19 @@ public class UserConnector {
         System.out.println("number of users: " + count);
     }
 
+    //UPDATE
+
+    //DELETE
+    public static boolean remove(ObjectId id){
+        Document filter = new Document("_id",id);
+        DeleteResult result = users.deleteOne(filter);
+        if(result.getDeletedCount()>0){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
 
 
 

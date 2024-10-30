@@ -9,9 +9,10 @@ import java.util.Scanner;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+
 public class CLI {
      static Scanner scanner = new Scanner(System.in);
-
+    public static ObjectId userId;
     public static void start(){
         boolean exit = false;
         System.out.println("Starting...");
@@ -148,10 +149,10 @@ public class CLI {
 
                     break;
                 case 2:
-                    System.out.println("to do");
+                    //updateProfile(); //se non cè nella tabella non lo metto
                     break;
                 case 3:
-                    System.out.println("to do");
+                    deleteProfile();
                     break;
                 case 4:
                     exit = true;
@@ -167,7 +168,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Hi Unsigned User, which action do you want to take?");
-            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Go back"),"unsignedUser> ");
+            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Stop"),"unsignedUser> ");
             switch(action){
                 case 1:
                     if(logIn(false)){
@@ -266,9 +267,14 @@ public class CLI {
         username = scanner.nextLine();
         System.out.println("Insert password");
         password = scanner.nextLine();
-        boolean esito = UserConnector.findUser(username,password,admin);
+        Document user = UserConnector.findUser(username,password,admin);
+        if(user.getString("name").equals("0")){
+            return false;
+        }else{
+            userId = user.getObjectId("_id");
+            return true;
+        }
 
-        return esito;
     }
     public static boolean register(){
         String username;
@@ -282,7 +288,7 @@ public class CLI {
         age = scanner.nextInt();
         scanner.nextLine();
         boolean esito = false;
-        if(!UserConnector.findUser(username,password,false)){
+        if(UserConnector.findUser(username,password,false).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
             esito = UserConnector.createUser(username,password,age);
         }else{
             System.out.println("The user already exists");
@@ -290,6 +296,28 @@ public class CLI {
 
 
         return esito;
+    }
+
+    public static boolean deleteProfile(){
+        System.out.println("Are you sure that you want to delete your profile?");
+        int c = chooseBetween(List.of("yes","no"),"user");
+        switch(c){
+            case 1:
+                if(UserConnector.remove(userId)){
+                    userId = null;
+                    System.out.println("User has been deleted");
+                    unsignedUser();
+                }else{
+                    System.out.println("User hasn't been deleted due to some problems");
+                }
+                break;
+            case 2:
+                System.out.println("The user hasn't been deleted");
+                break;
+            default:
+                System.out.println("wrong input, retry");
+        }
+        return true;
     }
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
