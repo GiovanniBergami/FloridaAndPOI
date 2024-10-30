@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 
 public class CLI {
      static Scanner scanner = new Scanner(System.in);
-    public static ObjectId userId;
+    public static Document sessionUser;
     public static void start(){
         boolean exit = false;
         System.out.println("Starting...");
@@ -40,22 +40,90 @@ public class CLI {
     public static void admin(){
         boolean exit = false;
         while(!exit){
-            System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Create","Remove","Update","Read","Go back"),"admin> ");
-            switch(action){
+            System.out.println("Choose collection");
+            int collection = chooseBetween(List.of("POIs","Reviews","Users","Go back"),"admin> ");
+            int action = 5;
+            if(collection != 4)
+                action = chooseBetween(List.of("Create","Read","Update","Delete","Go back"),"admin/POI> ");
+            switch(collection){
                 case 1:
-                    adminInsert();
+                    switch(action){
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            System.out.println("Insert the _id of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
+                            String id_exa = scanner.nextLine();
+                            ObjectId id = new ObjectId(id_exa);
+
+                            if(POIConnector.remove(id)){
+                                System.out.println("Deleted");
+                            }else{
+                                System.out.println("Not deleted, maybe not found");
+                            };
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
                     break;
                 case 2:
-                    System.out.println("to do");
+                    switch(action){
+                        case 1:
+                            break;
+                        case 2:
+                            System.out.println("todo");
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            System.out.println("Insert the _id of the review you want to remove");
+                            ObjectId review_id = new ObjectId(scanner.nextLine());
+                            System.out.println("Insert the _id of the POI of the review");
+                            ObjectId poi_id = new ObjectId(scanner.nextLine());
+                            if(ReviewConnector.remove(review_id,"")){
+                                POIConnector.removeReviewFromPOI(poi_id,review_id);
+                                System.out.println("Deleted");
+                            }else{
+                                System.out.println("Not deleted, maybe not found");
+                            };
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
                     break;
                 case 3:
-                    System.out.println("to do");
+                    switch(action){
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            System.out.println("todo");
+                            break;
+                        case 4:
+                            System.out.println("Insert the _id of the user you want to remove");
+                            String id_exa = scanner.nextLine();
+                            ObjectId id = new ObjectId(id_exa);
+                            if(UserConnector.remove(id)){
+                                System.out.println("Deleted");
+                            }else{
+                                System.out.println("Not deleted, maybe not found");
+                            };
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
                     break;
                 case 4:
-                    adminRead();
-                    break;
-                case 5:
                     exit = true;
                     break;
                 default:
@@ -132,7 +200,7 @@ public class CLI {
                     }else{
                         System.out.println(poi.toJson());
                     }
-                    int c = chooseBetween(List.of("See reviews","Add review","Go back"),"user");
+                    int c = chooseBetween(List.of("See reviews","Add review","Remove review","Go back"),"user");
                     switch(c){
                         case 1:
                             findReviews(poi);
@@ -141,6 +209,17 @@ public class CLI {
                             addReview(poi);
                             break;
                         case 3:
+                            System.out.println("Insert the _id of the review you want to remove");
+                            String id_exa = scanner.nextLine();
+                            ObjectId review_id = new ObjectId(id_exa);
+                            if(ReviewConnector.remove(review_id,sessionUser.getString("name"))){
+                                System.out.println("Deleted");
+                                POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
+                            }else{
+                                System.out.println("Not deleted, maybe not found");
+                            };
+                            break;
+                        case 4:
                             break;
                         default:
                             System.out.println("wrong input, retry");
@@ -271,7 +350,7 @@ public class CLI {
         if(user.getString("name").equals("0")){
             return false;
         }else{
-            userId = user.getObjectId("_id");
+            sessionUser = user;
             return true;
         }
 
@@ -303,8 +382,8 @@ public class CLI {
         int c = chooseBetween(List.of("yes","no"),"user");
         switch(c){
             case 1:
-                if(UserConnector.remove(userId)){
-                    userId = null;
+                if(UserConnector.remove(sessionUser.getObjectId("_id"))){
+                    sessionUser = null;
                     System.out.println("User has been deleted");
                     unsignedUser();
                 }else{
@@ -319,6 +398,8 @@ public class CLI {
         }
         return true;
     }
+
+
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
         for(String option : options){

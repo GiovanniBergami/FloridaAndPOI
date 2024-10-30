@@ -1,6 +1,7 @@
 package mongoConnectors;
 
 import com.mongodb.client.*;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -81,6 +82,30 @@ public class ReviewConnector {
         reviews.insertOne(doc);
 
         return doc.getObjectId("_id");
+    }
+
+    //DELETE
+    public static boolean remove(ObjectId id,String name){
+        if(name.equals("")){
+            Document filter = new Document("_id",id);
+            DeleteResult result = reviews.deleteOne(filter);
+            if(result.getDeletedCount()>0){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            Document filter = new Document("_id",id)
+                    .append("username",name);
+            DeleteResult result = reviews.deleteOne(filter);
+            if(result.getDeletedCount()>0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+
     }
 
 }

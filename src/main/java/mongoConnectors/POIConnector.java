@@ -1,6 +1,7 @@
 package mongoConnectors;
 
 import com.mongodb.client.*;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -87,7 +88,23 @@ public class POIConnector {
         return true;
     }
     //DELETE
+    public static boolean remove(ObjectId id){
+        Document filter = new Document("_id",id);
+        DeleteResult result = POIs.deleteOne(filter);
+        if(result.getDeletedCount()>0){
+            return true;
+        }else{
+            return false;
+        }
 
+    }
+
+    public static boolean removeReviewFromPOI(ObjectId poi_id, ObjectId review_id){
+        Document filter = new Document("_id",poi_id);
+        Document updateOperation = new Document("$pull",new Document("review_ids",review_id));
+        POIs.updateOne(filter,updateOperation);
+        return true;
+    }
 
     //ALTRE FUNZIONI
     public static void count(){
