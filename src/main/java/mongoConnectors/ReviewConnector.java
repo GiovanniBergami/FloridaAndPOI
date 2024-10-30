@@ -2,6 +2,7 @@ package mongoConnectors;
 
 import com.mongodb.client.*;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,8 +40,8 @@ public class ReviewConnector {
     }
 
 
-    public static Document getReview(String id){
-        Document review = reviews.find(eq("review_id",id)).first();
+    public static Document getReview(ObjectId id){
+        Document review = reviews.find(eq("_id",id)).first();
 
         if(review != null) {
             return review;

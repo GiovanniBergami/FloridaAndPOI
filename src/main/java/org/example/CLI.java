@@ -144,7 +144,7 @@ public class CLI {
                         default:
                             System.out.println("wrong input, retry");
                     }
-                    findReviews(poi);
+
 
                     break;
                 case 2:
@@ -216,7 +216,7 @@ public class CLI {
 
         Document review;
         int reviewIndex = 0;
-        List<String> review_ids = poi.getList("review_ids", String.class);
+        List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
         if(review_ids.size()==0)
             return true;
         while(true) {
