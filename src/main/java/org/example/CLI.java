@@ -123,7 +123,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Search POI","Update Profile","Delete Profile","Go back"),"user> ");
+            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Go back"),"user> ");
             switch(action){
                 case 1:
                     Document poi = findPOI();
@@ -149,7 +149,7 @@ public class CLI {
 
                     break;
                 case 2:
-                    //updateProfile(); //se non cè nella tabella non lo metto
+                    System.out.println("to do");
                     break;
                 case 3:
                     deleteProfile();
