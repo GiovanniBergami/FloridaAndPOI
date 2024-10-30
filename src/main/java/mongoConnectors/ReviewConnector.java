@@ -75,7 +75,7 @@ public class ReviewConnector {
     public static org.bson.types.ObjectId insertReview(String username, String date, String text, int rating){
 
         Document doc;
-        doc =  new Document("name",username)
+        doc =  new Document("username",username)
                         .append("date",date)
                         .append("text",text)
                         .append("stars",rating);
@@ -95,6 +95,7 @@ public class ReviewConnector {
                 return false;
             }
         }else{
+            System.out.println(name);
             Document filter = new Document("_id",id)
                     .append("username",name);
             DeleteResult result = reviews.deleteOne(filter);
