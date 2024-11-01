@@ -42,12 +42,11 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Choose collection");
-            int collection = chooseBetween(List.of("POIs","Reviews","Users","Go back"),"admin> ");
-            int action = 5;
-            if(collection != 4)
-                action = chooseBetween(List.of("Create","Read","Update","Delete","Go back"),"admin/POI> ");
+            int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Go back"),"admin> ");
+            int action = 0;
             switch(collection){
                 case 1:
+                    action = chooseBetween(List.of("Create","Read","Update","Delete","Go back"),"admin/POI> ");
                     switch(action){
                         case 1: //create POI
                             System.out.println("Insert city of the POI");
@@ -72,8 +71,10 @@ public class CLI {
                             }
                             break;
                         case 2:
+
                             break;
                         case 3:
+
                             break;
                         case 4:
                             System.out.println("Insert the name of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
@@ -105,15 +106,11 @@ public class CLI {
                     }
                     break;
                 case 2:
+                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/POI> ");
                     switch(action){
                         case 1:
                             break;
                         case 2:
-                            System.out.println("todo");
-                            break;
-                        case 3:
-                            break;
-                        case 4:
                             System.out.println("Insert the _id of the review you want to remove");
                             ObjectId review_id = new ObjectId(scanner.nextLine());
                             System.out.println("Insert the _id of the POI of the review");
@@ -125,22 +122,18 @@ public class CLI {
                                 System.out.println("Not deleted, maybe not found");
                             };
                             break;
-                        case 5:
+                        case 3:
                             break;
                         default:
                             System.out.println("wrong input");
                     }
                     break;
                 case 3:
+                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/POI> ");
                     switch(action){
                         case 1:
                             break;
                         case 2:
-                            break;
-                        case 3:
-                            System.out.println("todo");
-                            break;
-                        case 4:
                             System.out.println("Insert the _id of the user you want to remove");
                             String id_exa = scanner.nextLine();
                             ObjectId id = new ObjectId(id_exa);
@@ -150,13 +143,24 @@ public class CLI {
                                 System.out.println("Not deleted, maybe not found");
                             };
                             break;
-                        case 5:
+                        case 3:
                             break;
                         default:
                             System.out.println("wrong input");
                     }
                     break;
                 case 4:
+                    action = chooseBetween(List.of("Import","Go back"),"admin>");
+                    switch(action){
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
+                    break;
+                case 5:
                     exit = true;
                     break;
                 default:
