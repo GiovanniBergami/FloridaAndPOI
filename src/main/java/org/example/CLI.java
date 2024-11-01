@@ -92,7 +92,7 @@ public class CLI {
                                 for(ObjectId review_id : review_ids){
                                     ReviewConnector.remove(review_id,"");
                                 }
-                                CityConnector.removePOIFromCity(poi.getString("city"));
+                                CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"));
                             }else{
                                 System.out.println("Not deleted");
                             };

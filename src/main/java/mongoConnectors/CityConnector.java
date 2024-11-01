@@ -112,8 +112,8 @@ public class CityConnector {
 
     }
 
-    public static boolean removePOIFromCity(ObjectId city_id, ObjectId poi_id){
-        Document filter = new Document("_id",city_id);
+    public static boolean removePOIFromCity(String city_name, ObjectId poi_id){
+        Document filter = new Document("name",city_name);
         Document updateOperation = new Document("$pull",new Document("POI_ids",poi_id));
         cities.updateOne(filter,updateOperation);
         return true;
