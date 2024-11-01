@@ -56,11 +56,10 @@ public class CLI {
                             System.out.println(poi);
                             break;
                         case 3:
-
+                            updatePOI();
                             break;
                         case 4:
                             deletePOI();
-
                             break;
                         case 5:
                             break;
@@ -87,6 +86,7 @@ public class CLI {
                     action = chooseBetween(List.of("Read","Delete","Go back"),"admin/Users> ");
                     switch(action){
                         case 1:
+                            findUser();
                             break;
                         case 2:
                             removeUser();
@@ -101,6 +101,8 @@ public class CLI {
                     action = chooseBetween(List.of("Import","Go back"),"admin/Cities>");
                     switch(action){
                         case 1:
+                            System.out.println("Insert path");
+                            CityConnector.insertCities(scanner.nextLine());
                             break;
                         case 2:
                             break;
@@ -241,6 +243,40 @@ public class CLI {
         };
     }
 
+    public static void findUser(){
+        System.out.println("Enter user name");
+        Document user = UserConnector.findUser(scanner.nextLine());
+        if(user.getString("name").equals("0")){
+            System.out.println("User not found");
+        }else{
+            System.out.println(user);
+        }
+    }
+
+    public static void updatePOI(){
+        System.out.println("Insert the name of the poi to update");
+        Document poi = findPOI();
+        System.out.println(poi);
+        boolean exit = false;
+        while(!exit){
+            int c = chooseBetween(List.of("Update a field","Go back"),"admin/POI/update");
+            switch(c){
+                case 1:
+                    System.out.println("enter the name of the field");
+                    String field = scanner.nextLine();
+                    System.out.println("enter the value");
+                    String value = scanner.nextLine();
+                    POIConnector.updateFieldPOI(poi.getObjectId("_id"),field,value);
+
+                    break;
+                case 2:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("wrong input, retry");
+            }
+        }
+    }
 
     public static void user(){
         boolean exit = false;

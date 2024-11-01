@@ -94,7 +94,12 @@ public class POIConnector {
         return doc;
     }
     //UPDATE
-
+    public static boolean updateFieldPOI(ObjectId poi_id,String field,String value){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
+        Document filter = new Document("_id",poi_id);
+        Document updateOperation = new Document("$set",new Document(field,value));
+        POIs.updateOne(filter,updateOperation);
+        return true;
+    }
 
     public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
         Document filter = new Document("_id",poi_id);

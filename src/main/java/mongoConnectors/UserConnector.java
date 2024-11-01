@@ -66,8 +66,6 @@ public class UserConnector {
     public static Document findUser(String username){
         Document doc;
         doc = users.find(eq("name", username)).first();
-
-
         if(doc == null) {
             doc = new Document("name","0");
         }
