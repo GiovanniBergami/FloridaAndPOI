@@ -1,6 +1,7 @@
 package mongoConnectors;
 
-import com.mongodb.client.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -10,36 +11,33 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 
-public class POIConnector {
-    static MongoCollection<Document> POIs = mongoConnector.database.getCollection("POIs");
+public class CityConnector {
+    static MongoCollection<Document> cities = mongoConnector.database.getCollection("cities");
 
     //CRUD
 
     //CREATE
 
-    public static org.bson.types.ObjectId insertPOI(String name, String address, String city){
+    public static ObjectId insertCity(String name, String address, String city){
 
         Document doc;
         doc =  new Document("name",name)
-                .append("address",address)
-                .append("city",city)
-                .append("reviews_ids",new ArrayList<>())
-                .append("reviews_count",0)
-                .append("visit_count",0);
-        POIs.insertOne(doc);
+                .append("POI_count",0)
+                .append("visits",0)
+                .append("POI_ids",new ArrayList<>());
+        cities.insertOne(doc);
 
         return doc.getObjectId("_id");
     }
-    public static int insertPOI(String jsonPOI){
+    public static int insertCity(String jsonPOI){
         Document doc = Document.parse(jsonPOI);
-        POIs.insertOne(doc);
+        cities.insertOne(doc);
         System.out.println("inserimento avvenuto: ");
         return 0;
     }
-    public static int insertPOIs(String jsonPath){
+    public static int insertCities(String jsonPath){
 
         String line;
         Document doc;
@@ -50,7 +48,7 @@ public class POIConnector {
             while(fileReader.hasNextLine()){
                 line = fileReader.nextLine();
                 doc = Document.parse(line);
-                POIs.insertOne(doc);
+                cities.insertOne(doc);
             }
             fileReader.close();  //check if it gives errors. it shouldnt. if there are, delete it
         } catch(FileNotFoundException e){
@@ -63,7 +61,7 @@ public class POIConnector {
     //READ
     public static void printCollection(){
 
-        try (MongoCursor<Document> cursor = POIs.find().iterator())
+        try (MongoCursor<Document> cursor = cities.find().iterator())
         {
             while (cursor.hasNext())
             {
@@ -73,7 +71,7 @@ public class POIConnector {
     }
     public static void printCollection(int number){
         int i=0;
-        try (MongoCursor<Document> cursor = POIs.find().iterator())
+        try (MongoCursor<Document> cursor = cities.find().iterator())
         {
             while (cursor.hasNext() && i<number)
             {
@@ -83,9 +81,9 @@ public class POIConnector {
         }
     }
 
-    public static Document findPOI(String name){
+    public static Document findCity(String name){
         Document doc;
-        doc = POIs.find(eq("name", name)).first();
+        doc = cities.find(eq("name", name)).first();
 
         if(doc != null) {
             return doc;
@@ -96,16 +94,16 @@ public class POIConnector {
     //UPDATE
 
 
-    public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
-        Document filter = new Document("_id",poi_id);
-        Document updateOperation = new Document("$push",new Document("review_ids",review_id));
-        POIs.updateOne(filter,updateOperation);
+    public static boolean addPOIToCity(ObjectId city_id, ObjectId poi_id){
+        Document filter = new Document("_id",city_id);
+        Document updateOperation = new Document("$push",new Document("POI_ids",poi_id));
+        cities.updateOne(filter,updateOperation);
         return true;
     }
     //DELETE
     public static boolean remove(ObjectId id){
         Document filter = new Document("_id",id);
-        DeleteResult result = POIs.deleteOne(filter);
+        DeleteResult result = cities.deleteOne(filter);
         if(result.getDeletedCount()>0){
             return true;
         }else{
@@ -114,17 +112,17 @@ public class POIConnector {
 
     }
 
-    public static boolean removeReviewFromPOI(ObjectId poi_id, ObjectId review_id){
-        Document filter = new Document("_id",poi_id);
-        Document updateOperation = new Document("$pull",new Document("review_ids",review_id));
-        POIs.updateOne(filter,updateOperation);
+    public static boolean removePOIFromCity(ObjectId city_id, ObjectId poi_id){
+        Document filter = new Document("_id",city_id);
+        Document updateOperation = new Document("$pull",new Document("POI_ids",poi_id));
+        cities.updateOne(filter,updateOperation);
         return true;
     }
 
     //ALTRE FUNZIONI
     public static void count(){
-        long count = POIs.countDocuments();
-        System.out.println("number of POIs: " + count);
+        long count = cities.countDocuments();
+        System.out.println("number of cities: " + count);
     }
 
 }

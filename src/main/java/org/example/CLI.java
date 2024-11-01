@@ -1,5 +1,6 @@
 package org.example;
 
+import mongoConnectors.CityConnector;
 import mongoConnectors.POIConnector;
 import mongoConnectors.ReviewConnector;
 import mongoConnectors.UserConnector;
@@ -48,22 +49,54 @@ public class CLI {
             switch(collection){
                 case 1:
                     switch(action){
-                        case 1:
+                        case 1: //create POI
+                            System.out.println("Insert city of the POI");
+                            String city = scanner.nextLine();
+                            Document cityOfPOI = CityConnector.findCity(city); //ci vorrà un index sui nomi di città
+                            if(cityOfPOI.getString("name").equals("0")){
+                                System.out.println("The city doesn't exist");
+                                break;
+                            }else{
+                                System.out.println("Insert name of POI");
+                                String name = scanner.nextLine();
+                                if(!POIConnector.findPOI(name).getString("name").equals("0")){
+                                    System.out.println("This name already exists");
+                                    break;
+                                }else{
+                                    System.out.println("Insert address");
+                                    String address = scanner.nextLine();
+                                    ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
+                                    CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"),newPOIId);
+                                    System.out.println("The POI has been added");
+                                }
+                            }
                             break;
                         case 2:
                             break;
                         case 3:
                             break;
                         case 4:
-                            System.out.println("Insert the _id of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
-                            String id_exa = scanner.nextLine();
-                            ObjectId id = new ObjectId(id_exa);
+                            System.out.println("Insert the name of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
+                            String name = scanner.nextLine();
+                            Document poi = POIConnector.findPOI(name);
+                            if(poi.getString("name").equals("0")){
+                                System.out.println("poi not found");
+                                break;
+                            }
+
+                            ObjectId id = poi.getObjectId("_id");
 
                             if(POIConnector.remove(id)){
                                 System.out.println("Deleted");
+                                List<ObjectId> review_ids = poi.getList("review_ids",ObjectId.class);
+                                for(ObjectId review_id : review_ids){
+                                    ReviewConnector.remove(review_id,"");
+                                }
+                                CityConnector.removePOIFromCity(poi.getString("city"));
                             }else{
-                                System.out.println("Not deleted, maybe not found");
+                                System.out.println("Not deleted");
                             };
+
                             break;
                         case 5:
                             break;
