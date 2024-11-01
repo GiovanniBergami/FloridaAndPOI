@@ -62,6 +62,17 @@ public class UserConnector {
         }
         return doc;
     }
+
+    public static Document findUser(String username){
+        Document doc;
+        doc = users.find(eq("name", username)).first();
+
+
+        if(doc == null) {
+            doc = new Document("name","0");
+        }
+        return doc;
+    }
     public static void printCollection(){
 
         try (MongoCursor<Document> cursor = users.find().iterator())

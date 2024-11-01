@@ -49,54 +49,17 @@ public class CLI {
                     action = chooseBetween(List.of("Create","Read","Update","Delete","Go back"),"admin/POI> ");
                     switch(action){
                         case 1: //create POI
-                            System.out.println("Insert city of the POI");
-                            String city = scanner.nextLine();
-                            Document cityOfPOI = CityConnector.findCity(city); //ci vorrà un index sui nomi di città
-                            if(cityOfPOI.getString("name").equals("0")){
-                                System.out.println("The city doesn't exist");
-                                break;
-                            }else{
-                                System.out.println("Insert name of POI");
-                                String name = scanner.nextLine();
-                                if(!POIConnector.findPOI(name).getString("name").equals("0")){
-                                    System.out.println("This name already exists");
-                                    break;
-                                }else{
-                                    System.out.println("Insert address");
-                                    String address = scanner.nextLine();
-                                    ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
-                                    CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"),newPOIId);
-                                    System.out.println("The POI has been added");
-                                }
-                            }
+                            createPOI();
                             break;
                         case 2:
-
+                            Document poi = findPOI();
+                            System.out.println(poi);
                             break;
                         case 3:
 
                             break;
                         case 4:
-                            System.out.println("Insert the name of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
-                            String name = scanner.nextLine();
-                            Document poi = POIConnector.findPOI(name);
-                            if(poi.getString("name").equals("0")){
-                                System.out.println("poi not found");
-                                break;
-                            }
-
-                            ObjectId id = poi.getObjectId("_id");
-
-                            if(POIConnector.remove(id)){
-                                System.out.println("Deleted");
-                                List<ObjectId> review_ids = poi.getList("review_ids",ObjectId.class);
-                                for(ObjectId review_id : review_ids){
-                                    ReviewConnector.remove(review_id,"");
-                                }
-                                CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"));
-                            }else{
-                                System.out.println("Not deleted");
-                            };
+                            deletePOI();
 
                             break;
                         case 5:
@@ -106,21 +69,13 @@ public class CLI {
                     }
                     break;
                 case 2:
-                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/POI> ");
+                    action = chooseBetween(List.of("Read","Remove","Go back"),"admin/Reviews> ");
                     switch(action){
                         case 1:
+                            findReviews(findPOI());
                             break;
                         case 2:
-                            System.out.println("Insert the _id of the review you want to remove");
-                            ObjectId review_id = new ObjectId(scanner.nextLine());
-                            System.out.println("Insert the _id of the POI of the review");
-                            ObjectId poi_id = new ObjectId(scanner.nextLine());
-                            if(ReviewConnector.remove(review_id,"")){
-                                POIConnector.removeReviewFromPOI(poi_id,review_id);
-                                System.out.println("Deleted");
-                            }else{
-                                System.out.println("Not deleted, maybe not found");
-                            };
+                            removeReview();
                             break;
                         case 3:
                             break;
@@ -129,19 +84,12 @@ public class CLI {
                     }
                     break;
                 case 3:
-                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/POI> ");
+                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/Users> ");
                     switch(action){
                         case 1:
                             break;
                         case 2:
-                            System.out.println("Insert the _id of the user you want to remove");
-                            String id_exa = scanner.nextLine();
-                            ObjectId id = new ObjectId(id_exa);
-                            if(UserConnector.remove(id)){
-                                System.out.println("Deleted");
-                            }else{
-                                System.out.println("Not deleted, maybe not found");
-                            };
+                            removeUser();
                             break;
                         case 3:
                             break;
@@ -150,7 +98,7 @@ public class CLI {
                     }
                     break;
                 case 4:
-                    action = chooseBetween(List.of("Import","Go back"),"admin>");
+                    action = chooseBetween(List.of("Import","Go back"),"admin/Cities>");
                     switch(action){
                         case 1:
                             break;
@@ -223,6 +171,76 @@ public class CLI {
         }
 
     }
+
+    public static void createPOI(){
+        System.out.println("Insert city of the POI");
+        String city = scanner.nextLine();
+        Document cityOfPOI = CityConnector.findCity(city); //ci vorrà un index sui nomi di città
+        if(cityOfPOI.getString("name").equals("0")){
+            System.out.println("The city doesn't exist");
+            return;
+        }else{
+            System.out.println("Insert name of POI");
+            String name = scanner.nextLine();
+            if(!POIConnector.findPOI(name).getString("name").equals("0")){
+                System.out.println("This name already exists");
+                return;
+            }else{
+                System.out.println("Insert address");
+                String address = scanner.nextLine();
+                ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
+                CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"),newPOIId);
+                System.out.println("The POI has been added");
+            }
+        }
+    }
+
+    public static void deletePOI(){
+        System.out.println("Insert the name of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
+        String name = scanner.nextLine();
+        Document poi = POIConnector.findPOI(name);
+        if(poi.getString("name").equals("0")){
+            System.out.println("poi not found");
+            return;
+        }
+
+        ObjectId id = poi.getObjectId("_id");
+
+        if(POIConnector.remove(id)){
+            System.out.println("Deleted");
+            List<ObjectId> review_ids = poi.getList("review_ids",ObjectId.class);
+            for(ObjectId review_id : review_ids){
+                ReviewConnector.remove(review_id,"");
+            }
+            CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"));
+        }else{
+            System.out.println("Not deleted");
+        };
+    }
+
+    public static void removeReview(){
+        System.out.println("Insert the _id of the review you want to remove");
+        ObjectId review_id = new ObjectId(scanner.nextLine());
+        System.out.println("Insert the _id of the POI of the review");
+        ObjectId poi_id = new ObjectId(scanner.nextLine());
+        if(ReviewConnector.remove(review_id,"")){
+            POIConnector.removeReviewFromPOI(poi_id,review_id);
+            System.out.println("Deleted");
+        }else{
+            System.out.println("Not deleted, maybe not found");
+        };
+    }
+    public static void removeUser(){
+        System.out.println("Insert the _id of the user you want to remove");
+        String id_exa = scanner.nextLine();
+        ObjectId id = new ObjectId(id_exa);
+        if(UserConnector.remove(id)){
+            System.out.println("Deleted");
+        }else{
+            System.out.println("Not deleted, maybe not found");
+        };
+    }
+
 
     public static void user(){
         boolean exit = false;
