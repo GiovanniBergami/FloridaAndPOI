@@ -34,6 +34,21 @@ public class neoConnector {
 
 
     }
+    public static void prova2(){
+        try(var session = driver.session(SessionConfig.builder().withDatabase(dbUser).build())){
+            var people = session.executeRead(tx -> {
+                var result = tx.run(""" 
+                                           MATCH (p:Person) WHERE p.name STARTS WITH $filter
+                                           RETURN p.name AS name ORDER BY name
+                                           """,Map.of("filter","A"));
+                return result.list();
+            });
+            people.forEach(person -> {
+                System.out.println(person);
+            });
+        }
+    }
+
     public static void close() {
     driver.close();
     }

@@ -546,7 +546,7 @@ public class CLI {
                     exit = true;
                     break;
                 case 2:
-                    neoConnector.prova();
+                    neoConnector.prova2();
                     break;
                 default:
                     System.out.println("wrong input");
