@@ -7,6 +7,8 @@ import mongoConnectors.UserConnector;
 
 import java.util.List;
 import java.util.Scanner;
+
+import neoConnectors.neoConnector;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -361,7 +363,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Hi Unsigned User, which action do you want to take?");
-            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Stop"),"unsignedUser> ");
+            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","TestNeo - sperimental","Stop"),"unsignedUser> ");
             switch(action){
                 case 1:
                     if(logIn(false)){
@@ -389,6 +391,9 @@ public class CLI {
                     }
                     break;
                 case 5:
+                    neoSperimental();
+                    break;
+                case 6:
                     exit = true;
                     break;
                 default:
@@ -530,6 +535,24 @@ public class CLI {
         for(int f = 0;f < 20; f++){
             System.out.println();
         }
+    }
+
+    public static void neoSperimental(){
+        boolean exit = false;
+        while(!exit){
+            System.out.println("cosa vuoi fare?");
+            switch(chooseBetween(List.of("go back","prova"),"testing")){
+                case 1:
+                    exit = true;
+                    break;
+                case 2:
+                    neoConnector.prova();
+                    break;
+                default:
+                    System.out.println("wrong input");
+            }
+        }
+
     }
 }
 

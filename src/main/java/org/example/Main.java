@@ -8,14 +8,11 @@ import java.util.Scanner;
 import org.bson.Document;
 public class Main {
     public static void main(String[] args) {
-
-//        neoConnector.connect();
-
-
-
+        neoConnector.connect();
         CLI.unsignedUser();
         mongoConnector.close();
         CLI.scanner.close();
+        neoConnector.close();
     }
 }
 
