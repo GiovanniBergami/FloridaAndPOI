@@ -13,7 +13,7 @@ public class Main {
 
 
 
-        CLI.start();
+        CLI.unsignedUser();
         mongoConnector.close();
         CLI.scanner.close();
     }

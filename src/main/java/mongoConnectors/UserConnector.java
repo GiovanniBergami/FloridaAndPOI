@@ -52,7 +52,7 @@ public class UserConnector {
     public static Document findUser(String username,String password,boolean admin){
         Document doc;
         if(admin) {
-            doc = users.find(and(eq("name", username), eq("password", password), eq("admin", 1))).first();
+            doc = users.find(and(eq("name", username), eq("password", password), eq("admin", "1"))).first();
         }else {
             doc = users.find(and(eq("name", username), eq("password", password))).first();
         }
@@ -110,7 +110,12 @@ public class UserConnector {
         }
 
     }
-
+    public static boolean updateFieldUser(ObjectId user_id,String field,String value){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
+        Document filter = new Document("_id",user_id);
+        Document updateOperation = new Document("$set",new Document(field,value));
+        users.updateOne(filter,updateOperation);
+        return true;
+    }
 
 
 }

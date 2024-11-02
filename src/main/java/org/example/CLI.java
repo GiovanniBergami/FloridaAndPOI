@@ -46,7 +46,8 @@ public class CLI {
             int action = 0;
             switch(collection){
                 case 1:
-                    action = chooseBetween(List.of("Create","Read","Update","Delete","Go back"),"admin/POI> ");
+                    action = chooseBetween(List.of("Create one","Read one","Update one","Delete one",
+                            "Import collection from json","Read first n","Go back"),"admin/POI> ");
                     switch(action){
                         case 1: //create POI
                             createPOI();
@@ -62,13 +63,26 @@ public class CLI {
                             deletePOI();
                             break;
                         case 5:
+                            System.out.println("Insert POIs, specify path");
+                            POIConnector.insertPOIs(scanner.nextLine());
+                            POIConnector.count();
+                            break;
+                        case 6:
+                            System.out.println("how many?");
+                            int n = scanner.nextInt();
+                            scanner.nextLine(); //toglie il \n del nextInt
+                            POIConnector.printCollection(n);
+                            POIConnector.count();
+                            break;
+                        case 7:
                             break;
                         default:
                             System.out.println("wrong input");
                     }
                     break;
                 case 2:
-                    action = chooseBetween(List.of("Read","Remove","Go back"),"admin/Reviews> ");
+                    action = chooseBetween(List.of("Read","Remove",
+                            "Import collection from json","Read first n","Go back"),"admin/Reviews> ");
                     switch(action){
                         case 1:
                             findReviews(findPOI());
@@ -77,13 +91,26 @@ public class CLI {
                             removeReview();
                             break;
                         case 3:
+                            System.out.println("Insert Reviews, specify path");
+                            ReviewConnector.insertReviews(scanner.nextLine());
+                            ReviewConnector.count();
+                            break;
+                        case 4:
+                            System.out.println("how many?");
+                            int n = scanner.nextInt();
+                            scanner.nextLine();
+                            ReviewConnector.printCollection(n);
+                            ReviewConnector.count();
+                            break;
+                        case 5:
                             break;
                         default:
                             System.out.println("wrong input");
                     }
                     break;
                 case 3:
-                    action = chooseBetween(List.of("Read","Delete","Go back"),"admin/Users> ");
+                    action = chooseBetween(List.of("Read","Delete","Update",
+                            "Import collection from json","Read all collection","Go back"),"admin/Users> ");
                     switch(action){
                         case 1:
                             findUser();
@@ -92,19 +119,53 @@ public class CLI {
                             removeUser();
                             break;
                         case 3:
+                            System.out.println("insert id user -- funzione sperimentale");
+                            ObjectId user = new ObjectId(scanner.nextLine());
+                            System.out.println("insert field");
+                            String field = scanner.nextLine();
+                            System.out.println("insert value");
+                            String value = scanner.nextLine();
+                            UserConnector.updateFieldUser(user,field,value);
+                            break;
+                        case 4:
+                            System.out.println("Insert Users, specify path");
+                            UserConnector.insertUsers(scanner.nextLine());
+                            UserConnector.count();
+                            break;
+                        case 5:
+                            System.out.println("how many?");
+                            int n = scanner.nextInt();
+                            scanner.nextLine();
+                            UserConnector.printCollection(n);
+                            UserConnector.count();
+                            break;
+                        case 6:
                             break;
                         default:
                             System.out.println("wrong input");
                     }
                     break;
                 case 4:
-                    action = chooseBetween(List.of("Import","Go back"),"admin/Cities>");
+                    action = chooseBetween(List.of("Import",
+                            "Import collection from json","Read all collection","Go back"),"admin/Cities>");
                     switch(action){
                         case 1:
                             System.out.println("Insert path");
                             CityConnector.insertCities(scanner.nextLine());
                             break;
                         case 2:
+                            System.out.println("Insert Cities, specify path");
+                            CityConnector.insertCities(scanner.nextLine());
+                            CityConnector.count();
+                            break;
+                        case 3:
+                            System.out.println("how many?");
+                            int n = scanner.nextInt();
+                            scanner.nextLine();
+                            CityConnector.printCollection(n);
+                            CityConnector.count();
+                            break;
+                        case 4:
                             break;
                         default:
                             System.out.println("wrong input");
@@ -120,59 +181,6 @@ public class CLI {
 
     }
 
-
-    public static void adminInsert(){
-        int activity = chooseBetween(List.of("Create POIs","Create Users","Create Reviews"," go back"),"admin/insert> ");
-
-        switch(activity){
-            case 1:
-                System.out.println("Insert POIs, specify path");
-                POIConnector.insertPOIs(scanner.nextLine());
-                POIConnector.count();
-                break;
-            case 2:
-                System.out.println("Insert Users");
-                int prova;
-                prova = scanner.nextInt();
-                System.out.println(prova);
-                break;
-            case 3:
-                System.out.println("Insert Reviews, specify path");
-                ReviewConnector.insertReviews(scanner.nextLine());
-                ReviewConnector.count();
-                ReviewConnector.printCollection(3);
-                break;
-            case 4:
-                break;
-            default:
-                System.out.println("wrong input, retry");
-        }
-    }
-    public static void adminRead(){
-        int activity = chooseBetween(List.of("Read POIs","Read Users","Read Reviews"," go back"),"admin/insert> ");
-        System.out.println("how many?");
-        int n = scanner.nextInt();
-        scanner.nextLine(); //toglie il \n del nextInt
-        switch(activity){
-            case 1:
-                POIConnector.printCollection(n);
-                POIConnector.count();
-                break;
-            case 2:
-                UserConnector.printCollection(n);
-                UserConnector.count();
-                break;
-            case 3:
-                ReviewConnector.printCollection(n);
-                ReviewConnector.count();
-                break;
-            case 4:
-                break;
-            default:
-                System.out.println("wrong input, retry");
-        }
-
-    }
 
     public static void createPOI(){
         System.out.println("Insert city of the POI");
