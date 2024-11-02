@@ -541,12 +541,57 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("cosa vuoi fare?");
-            switch(chooseBetween(List.of("go back","prova"),"testing")){
+            String name;
+            String name1;
+            String name2;
+            switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
+                    "remove friendship","propose friendship","remove friendship propose","accept friendship"),"testing")){
                 case 1:
                     exit = true;
                     break;
                 case 2:
-                    neoConnector.prova2();
+                    System.out.println("name");
+                    name = scanner.nextLine();
+                    System.out.println("età");
+                    int eta = scanner.nextInt();
+                    scanner.nextLine();
+                    neoConnector.addUser(name,eta);
+                    break;
+                case 3:
+                    System.out.println("name1");
+                    name1 = scanner.nextLine();
+                    System.out.println("name2");
+                    name2 = scanner.nextLine();
+                    neoConnector.addFriendship(name1,name2);
+                    break;
+                case 4:
+                    System.out.println("name");
+                    neoConnector.deleteUser(scanner.nextLine());
+                    break;
+                case 5:
+                    System.out.println("name1");
+                    name1 = scanner.nextLine();
+                    System.out.println("name2");
+                    name2 = scanner.nextLine();
+                    neoConnector.deleteFriendship(name1,name2);
+                    neoConnector.deleteFriendship(name2,name1);
+                    break;
+                case 6:
+                    System.out.println("name1");
+                    name1 = scanner.nextLine();
+                    System.out.println("name2");
+                    name2 = scanner.nextLine();
+                    neoConnector.addFriendshipRequest(name1,name2);
+                    break;
+                case 7:
+                    System.out.println("name1");
+                    name1 = scanner.nextLine();
+                    System.out.println("name2");
+                    name2 = scanner.nextLine();
+                    neoConnector.deleteRequest(name1,name2);
+                    break;
+                case 8:
+                    System.out.println("to do");
                     break;
                 default:
                     System.out.println("wrong input");

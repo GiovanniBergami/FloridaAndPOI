@@ -49,8 +49,155 @@ public class neoConnector {
         }
     }
 
+    public static void importAll(String path){  //non va
+        try(Session session = driver.session()){
+            String cypherQuery = "CALL apoc.load.json($filePath) YIELD value " +
+                    "CREATE (p:User {name: value.name, age: value.age})";
+            session.run(cypherQuery,Values.parameters("filePath",path));
+        }
+    }
+
+    public static void addUser(String name,int age){
+        try(Session session = driver.session()){
+            String query = "CREATE (u:User {name: $name, age: $age}) RETURN u";
+            Result result = session.run(query,
+                    Values.parameters("name", name, "age", age));
+
+            // Recupera e stampa i dettagli dell'utente creato
+            var createdUser = result.single().get(0).asNode();
+            System.out.println("Utente creato: " + createdUser.get("name").asString() +
+                    ", Età: " + createdUser.get("age").asInt());
+        }
+    }
+    public static void addFriendshipRequest(String requester, String objective){
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di amicizia
+            String query = """
+                        MATCH (u1:User {name: $userName1}), (u2:User {name: $userName2})
+                        CREATE (u1)-[:REQUESTED]->(u2)
+                        RETURN u1, u2
+                    """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName1", objective, "userName2", requester));
+
+            // Recupera e stampa i dettagli degli utenti coinvolti
+            if (result.hasNext()) {
+                var record = result.single();
+                var user1 = record.get(0).asNode();
+                var user2 = record.get(1).asNode();
+                System.out.println("Richiesta di amicizia creata tra: " +
+                        user1.get("name").asString() + " e " +
+                        user2.get("name").asString());
+            }
+        }
+    }
+
+    public static void addFriendship(String name1,String name2){
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di amicizia
+            String query = """
+                        MATCH (u1:User {name: $userName1}), (u2:User {name: $userName2})
+                        CREATE (u1)-[:FRIENDS]->(u2)
+                        CREATE (u2)-[:FRIENDS]->(u1)
+                        RETURN u1, u2
+                    """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName1", name1, "userName2", name2));
+
+            // Recupera e stampa i dettagli degli utenti coinvolti
+            if (result.hasNext()) {
+                var record = result.single();
+                var user1 = record.get(0).asNode();
+                var user2 = record.get(1).asNode();
+                System.out.println("Relazione di amicizia creata tra: " +
+                        user1.get("name").asString() + " e " +
+                        user2.get("name").asString());
+            }
+        }
+    }
+
+    public static void deleteRequest(String requester,String objective){
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u1:User {name: $userName1})-[r:REQUESTED]->(u2:User {name: $userName2})
+                DELETE r
+                RETURN u1, u2
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName1", objective, "userName2", requester));
+
+            // Recupera e stampa i dettagli degli utenti coinvolti
+            if (result.hasNext()) {
+                var record = result.single();
+                var user1 = record.get(0).asNode();
+                var user2 = record.get(1).asNode();
+                System.out.println("Richiesta di amicizia rimossa tra: " +
+                        user1.get("name").asString() + " e " +
+                        user2.get("name").asString());
+            } else {
+                System.out.println("Nessuna relazione rimossa. Verifica che la relazione esista.");
+            }
+        }
+    }
+    public static void deleteFriendship(String name1,String name2){
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u1:User {name: $userName1})-[r:FRIENDS]->(u2:User {name: $userName2})
+                DELETE r
+                RETURN u1, u2
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName1", name1, "userName2", name2));
+
+            // Recupera e stampa i dettagli degli utenti coinvolti
+            if (result.hasNext()) {
+                var record = result.single();
+                var user1 = record.get(0).asNode();
+                var user2 = record.get(1).asNode();
+                System.out.println("Relazione di amicizia rimossa tra: " +
+                        user1.get("name").asString() + " e " +
+                        user2.get("name").asString());
+            } else {
+                System.out.println("Nessuna relazione rimossa. Verifica che la relazione esista.");
+            }
+        }
+    }
+
+    public static void deleteUser(String userNameToRemove){
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u:User {name: $userName})
+                DETACH DELETE u
+                RETURN u
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName", userNameToRemove));
+
+            // Controlla se l'utente è stato effettivamente rimosso
+            if (result.hasNext()) {
+                System.out.println("Utente rimosso: " + userNameToRemove);
+            } else {
+                System.out.println("Nessun utente trovato con il nome: " + userNameToRemove);
+            }
+        }
+    }
+
     public static void close() {
     driver.close();
     }
 
 }
+
+/* CANVAS
+public static void deleteFriendship(String name1,String name2){
+        try(Session session = driver.session()){
+
+        }
+    }
+
+ */
