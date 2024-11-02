@@ -41,8 +41,8 @@ public class CLI {
     public static void admin(){
         boolean exit = false;
         while(!exit){
-            System.out.println("Choose collection");
-            int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Go back"),"admin> ");
+            System.out.println("Choose option");
+            int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Analytics","Go back"),"admin> ");
             int action = 0;
             switch(collection){
                 case 1:
@@ -172,6 +172,21 @@ public class CLI {
                     }
                     break;
                 case 5:
+                    System.out.println("Analytics");
+                    switch(chooseBetween(List.of("query1","query2","query3"),"")){
+                        case 1:
+                            break;
+                        case 2:
+                            System.out.println("todo");
+                            break;
+                        case 3:
+                            System.out.println("todoo");
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
+                    break;
+                case 6:
                     exit = true;
                     break;
                 default:
