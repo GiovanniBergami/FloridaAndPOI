@@ -49,7 +49,7 @@ public class neoConnector {
         }
     }
 
-    public static void importAll(String path){  //non va
+    public static void importAll(String path){  //non va ma non è necessario. in un uso reale gli user si segnano loro mano a mano. solo poi e città devono essere importati in bulk quando il servizio viene lanciato
         try(Session session = driver.session()){
             String cypherQuery = "CALL apoc.load.json($filePath) YIELD value " +
                     "CREATE (p:User {name: value.name, age: value.age})";
