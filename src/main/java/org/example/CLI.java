@@ -545,7 +545,7 @@ public class CLI {
             String name1;
             String name2;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
-                    "remove friendship","propose friendship","remove friendship propose","accept friendship"),"testing")){
+                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -591,7 +591,19 @@ public class CLI {
                     neoConnector.deleteRequest(name1,name2);
                     break;
                 case 8:
-                    System.out.println("to do");
+                    System.out.println("name");
+                    neoConnector.getRequested(scanner.nextLine());
+                    break;
+                case 9:
+                    System.out.println("enter name");
+                    String user = scanner.nextLine();
+                    System.out.println("hai queste richieste:");
+                    //String user = sessionUser.getString("name"); DEFINITIVO
+                    neoConnector.getRequested(user);
+                    System.out.println("enter the name of the one of the request");
+                    String requester = scanner.nextLine();
+                    neoConnector.deleteRequest(requester,user);
+                    neoConnector.addFriendship(requester,user);
                     break;
                 default:
                     System.out.println("wrong input");

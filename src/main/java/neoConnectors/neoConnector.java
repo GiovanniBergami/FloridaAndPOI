@@ -115,6 +115,8 @@ public class neoConnector {
                         user1.get("name").asString() + " e " +
                         user2.get("name").asString());
             }
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -184,6 +186,20 @@ public class neoConnector {
             } else {
                 System.out.println("Nessun utente trovato con il nome: " + userNameToRemove);
             }
+        }
+    }
+    public static void getRequested(String userName){
+        try(Session session = driver.session()){
+            String query = """
+                    MATCH (u:User {name : $userName} )-[r:REQUESTED]->(u2: User)
+                    RETURN u2.name as name
+                    """;
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName", userName));
+            var ris = result.list();
+            ris.forEach(person -> {
+                System.out.println(person.get("name").asString());
+            });
         }
     }
 
