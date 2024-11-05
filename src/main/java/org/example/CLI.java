@@ -545,7 +545,7 @@ public class CLI {
             String name1;
             String name2;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
-                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship"),"testing")){
+                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -555,7 +555,9 @@ public class CLI {
                     System.out.println("età");
                     int eta = scanner.nextInt();
                     scanner.nextLine();
-                    neoConnector.addUser(name,eta);
+                    System.out.println("mongoId");
+                    String mongoId = scanner.nextLine();
+                    neoConnector.addUser(name,mongoId);
                     break;
                 case 3:
                     System.out.println("name1");
@@ -604,6 +606,10 @@ public class CLI {
                     String requester = scanner.nextLine();
                     neoConnector.deleteRequest(requester,user);
                     neoConnector.addFriendship(requester,user);
+                    break;
+                case 10:
+                    //UserConnector.createNeoCollection();
+                    UserConnector.createNeoFriendship();
                     break;
                 default:
                     System.out.println("wrong input");

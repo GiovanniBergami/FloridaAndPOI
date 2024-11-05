@@ -3,11 +3,13 @@ package mongoConnectors;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
+import neoConnectors.neoConnector;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.and;
@@ -90,6 +92,39 @@ public class UserConnector {
                 System.out.println(cursor.next().toJson());
                 i++;
             }
+        }
+    }
+
+    public static void createNeoCollection(){ //put users in neo db
+        int i=0;
+        try (MongoCursor<Document> cursor = users.find().iterator())
+        {
+            Document doc;
+            while (cursor.hasNext())
+            {
+                doc = cursor.next();
+                neoConnector.addUser(doc.getString("name"),doc.getObjectId("_id").toString());
+                i++;
+            }
+            System.out.println(i);
+        }
+    }
+    public static void createNeoFriendship(){ //put users in neo db
+        int i=0;
+        try (MongoCursor<Document> cursor = users.find().iterator())
+        {
+            Document doc;
+            while (cursor.hasNext())
+            {
+                doc = cursor.next();
+                String current = doc.getObjectId("_id").toString();
+                List<ObjectId> friends = doc.getList("friends", ObjectId.class);
+                for(ObjectId f : friends){
+                    neoConnector.addFriendshipGivenMongoId(current,f.toString());
+                }
+                i++;
+            }
+            System.out.println(i);
         }
     }
     public static void count(){

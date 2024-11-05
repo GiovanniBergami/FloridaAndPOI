@@ -10,8 +10,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
+
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+
+
 
 public class POIConnector {
     static MongoCollection<Document> POIs = mongoConnector.database.getCollection("POIs");
@@ -41,21 +45,23 @@ public class POIConnector {
     }
     public static int insertPOIs(String jsonPath){
 
-        String line;
-        Document doc;
-        try {
-            File file = new File(jsonPath);
-            Scanner fileReader = new Scanner(file);
-
-            while(fileReader.hasNextLine()){
-                line = fileReader.nextLine();
-                doc = Document.parse(line);
-                POIs.insertOne(doc);
-            }
-            fileReader.close();  //check if it gives errors. it shouldnt. if there are, delete it
-        } catch(FileNotFoundException e){
-            System.out.println(e.getMessage());
-        }
+//        String line;
+//        Document doc;
+//
+//        try {
+////            File file = new File(jsonPath);
+////            Scanner fileReader = new Scanner(file);
+////
+////            while(fileReader.hasNextLine()){
+////                line = fileReader.nextLine();
+////                doc = Document.parse(line);
+////                POIs.insertOne(doc);
+////            }
+//
+//            //fileReader.close();  //check if it gives errors. it shouldnt. if there are, delete it
+//        } catch(FileNotFoundException e){
+//            System.out.println(e.getMessage());
+//        }
 
         return 0;
     }

@@ -1,8 +1,12 @@
 package neoConnectors;
 
+import org.bson.Document;
 import org.neo4j.driver.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class neoConnector {
@@ -49,24 +53,36 @@ public class neoConnector {
         }
     }
 
-    public static void importAll(String path){  //non va ma non è necessario. in un uso reale gli user si segnano loro mano a mano. solo poi e città devono essere importati in bulk quando il servizio viene lanciato
-        try(Session session = driver.session()){
-            String cypherQuery = "CALL apoc.load.json($filePath) YIELD value " +
-                    "CREATE (p:User {name: value.name, age: value.age})";
-            session.run(cypherQuery,Values.parameters("filePath",path));
+    public static void importAll(){  //se non va non è necessario. in un uso reale gli user si segnano loro mano a mano. solo poi e città devono essere importati in bulk quando il servizio viene lanciato
+        try{
+            String line;
+            Document doc;
+            File file = new File("dataset/users.json");
+            Scanner fileReader = new Scanner(file);
+
+            while(fileReader.hasNextLine()){
+                line = fileReader.nextLine();
+                doc = Document.parse(line);
+                //addUser(doc.getString("name"),doc.getInteger("age"),doc.getObjectId("_id").toString());
+                System.out.println(""+doc.getString("name")+doc.getInteger("age")+doc.getObjectId("_id").toString());
+            }
+
+            fileReader.close();  //check if it gives errors. it shouldnt. if there are, delete it
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    public static void addUser(String name,int age){
+    public static void addUser(String name,String mongoId){
         try(Session session = driver.session()){
-            String query = "CREATE (u:User {name: $name, age: $age}) RETURN u";
+            String query = "CREATE (u:User {name: $name,mongoId: $mongoId}) RETURN u";
             Result result = session.run(query,
-                    Values.parameters("name", name, "age", age));
+                    Values.parameters("name", name,"mongoId",mongoId));
 
             // Recupera e stampa i dettagli dell'utente creato
-            var createdUser = result.single().get(0).asNode();
-            System.out.println("Utente creato: " + createdUser.get("name").asString() +
-                    ", Età: " + createdUser.get("age").asInt());
+//            var createdUser = result.single().get(0).asNode();
+//            System.out.println("Utente creato: " + createdUser.get("name").asString() +
+//                    ", mongoId: "+ createdUser.get("mongoId"));
         }
     }
     public static void addFriendshipRequest(String requester, String objective){
@@ -98,8 +114,8 @@ public class neoConnector {
             // Esegui la query per creare una relazione di amicizia
             String query = """
                         MATCH (u1:User {name: $userName1}), (u2:User {name: $userName2})
-                        CREATE (u1)-[:FRIENDS]->(u2)
-                        CREATE (u2)-[:FRIENDS]->(u1)
+                        MERGE (u1)-[:FRIENDS]->(u2)
+                        MERGE (u2)-[:FRIENDS]->(u1)
                         RETURN u1, u2
                     """;
 
@@ -207,6 +223,32 @@ public class neoConnector {
     driver.close();
     }
 
+    public static void addFriendshipGivenMongoId(String name1, String name2) {
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di amicizia
+            String query = """
+                        MATCH (u1:User {mongoId: $userName1}), (u2:User {mongoId: $userName2})
+                        MERGE (u1)-[:FRIENDS]->(u2)
+                        MERGE (u2)-[:FRIENDS]->(u1)
+                        RETURN u1, u2
+                    """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName1", name1, "userName2", name2));
+
+             //Recupera e stampa i dettagli degli utenti coinvolti
+//            if (result.hasNext()) {
+//                var record = result.single();
+//                var user1 = record.get(0).asNode();
+//                var user2 = record.get(1).asNode();
+//                System.out.println("Relazione di amicizia creata tra: " +
+//                        user1.get("name").asString() + " e " +
+//                        user2.get("name").asString());
+//            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
 
 /* CANVAS
@@ -215,5 +257,8 @@ public static void deleteFriendship(String name1,String name2){
 
         }
     }
+
+// CALL apoc.import.graphml('/tmp/complete-graph.graphml', {batchSize: 10000, storeNodeIds: false}) per ripristinare il graph
+
 
  */
