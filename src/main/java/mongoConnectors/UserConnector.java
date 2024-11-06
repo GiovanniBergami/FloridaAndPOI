@@ -42,6 +42,10 @@ public class UserConnector {
 
     public static boolean createUser(String username,String password,int age){
         Document doc;
+        if(users.find(eq("name",username)).first() != null) {
+            System.out.println("Username already taken");
+            return false;
+        }
         doc =  new Document("name",username)
                 .append("password",password)
                 .append("age",age);

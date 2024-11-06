@@ -85,6 +85,19 @@ public class neoConnector {
 //                    ", mongoId: "+ createdUser.get("mongoId"));
         }
     }
+
+    public static void addPOI(String name,String mongoId){
+        try(Session session = driver.session()){
+            String query = "CREATE (u:POI {name: $name,mongoId: $mongoId}) RETURN u";
+            Result result = session.run(query,
+                    Values.parameters("name", name,"mongoId",mongoId));
+
+            // Recupera e stampa i dettagli dell'utente creato
+//            var createdUser = result.single().get(0).asNode();
+//            System.out.println("Utente creato: " + createdUser.get("name").asString() +
+//                    ", mongoId: "+ createdUser.get("mongoId"));
+        }
+    }
     public static void addFriendshipRequest(String requester, String objective){
         try(Session session = driver.session()) {
             // Esegui la query per creare una relazione di amicizia
@@ -237,6 +250,33 @@ public class neoConnector {
                     org.neo4j.driver.Values.parameters("userName1", name1, "userName2", name2));
 
              //Recupera e stampa i dettagli degli utenti coinvolti
+//            if (result.hasNext()) {
+//                var record = result.single();
+//                var user1 = record.get(0).asNode();
+//                var user2 = record.get(1).asNode();
+//                System.out.println("Relazione di amicizia creata tra: " +
+//                        user1.get("name").asString() + " e " +
+//                        user2.get("name").asString());
+//            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void addVisit(String poiId, String name,int stars) {
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
+            String query = """
+                        MATCH (u1:POI {mongoId: $poiId}), (u2:User {mongoId: $userName})
+                        MERGE (u1)-[:VISIT{stars:$stars}]->(u2)
+                        MERGE (u2)-[:VISIT{stars:$stars}]->(u1)  
+                        RETURN u1, u2
+                    """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("poiId", poiId, "userName", name,"stars",stars));
+
+            //Recupera e stampa i dettagli degli utenti coinvolti
 //            if (result.hasNext()) {
 //                var record = result.single();
 //                var user1 = record.get(0).asNode();

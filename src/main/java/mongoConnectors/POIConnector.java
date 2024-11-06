@@ -2,12 +2,14 @@ package mongoConnectors;
 
 import com.mongodb.client.*;
 import com.mongodb.client.result.DeleteResult;
+import neoConnectors.neoConnector;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -136,6 +138,44 @@ public class POIConnector {
     public static void count(){
         long count = POIs.countDocuments();
         System.out.println("number of POIs: " + count);
+    }
+
+    public static void createNeoCollection(){ //put POIs in neo db
+        int i=0;
+        try (MongoCursor<Document> cursor = POIs.find().iterator())
+        {
+            Document doc;
+            while (cursor.hasNext())
+            {
+                doc = cursor.next();
+                neoConnector.addPOI(doc.getString("name"),doc.getObjectId("_id").toString());
+                i++;
+            }
+            System.out.println(i);
+        }
+    }
+    public static void createNeoVisits(){ //put visits in neo based on reviews
+        int i=0;
+        try (MongoCursor<Document> cursor = POIs.find().iterator())
+        {
+            Document poi;
+            Document review;
+            String user_id;
+            while (cursor.hasNext())
+            {
+                poi = cursor.next();
+                String poi_id = poi.getObjectId("_id").toString();
+                List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
+                for(ObjectId review_id: review_ids){
+                    review = ReviewConnector.getReview(review_id);
+
+                    neoConnector.addVisit(poi_id,review.getString("name"),review.getInteger("stars")); //aggiungiamo una visita tra il poi e l'user. assumiamo ci sia un indice sul nome dell'user sennò è un casino
+                }
+
+                i++;
+            }
+            System.out.println(i);
+        }
     }
 
 }

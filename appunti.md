@@ -59,3 +59,68 @@ db.users.updateOne(
 }
     
 
+
+rimuovere duplicati
+const names = db.users.aggregate([
+{
+$group: {
+_id: "$name",         // Raggruppa per il campo "name"
+count: { $sum: 1 }    // Conta il numero di occorrenze di ogni nome
+}
+},
+{
+$match: {
+count: { $gt: 1 }     // Filtra solo i gruppi con più di un'istanza (duplicati)
+}
+},
+{
+$group: {
+_id: null,                 // Usa `_id: null` per aggregare tutto in un unico documento
+duplicates: { $push: "$_id" }  // Colleziona i nomi duplicati in un array `duplicates`
+}
+},
+{
+$project: {
+_id: 0,                // Esclude l'ID dal risultato
+duplicates: 1          // Include solo l'array dei duplicati
+}
+}
+]).toArray();
+
+// Ora dobbiamo rimuovere solo la prima occorrenza di ogni duplicato
+names.forEach(doc => {
+doc.duplicates.forEach(name => {
+// Rimuovi solo la prima occorrenza di ciascun nome
+db.users.deleteOne({ name: name });
+});
+});
+
+
+vedere duplicati
+
+db.users.aggregate([
+{
+$group: {
+_id: "$name",         // Raggruppa per il campo "name"
+count: { $sum: 1 }    // Conta il numero di occorrenze di ogni nome
+}
+},
+{
+$match: {
+count: { $gt: 1 }     // Filtra solo i gruppi con più di un'istanza (duplicati)
+}
+},
+{
+$group: {
+_id: null,                 // Usando `_id: null` aggrega tutto in un unico documento
+duplicates: { $push: "$_id" }  // Colleziona i nomi duplicati in un array `duplicates`
+}
+},
+{
+$project: {
+_id: 0,                // Esclude l'ID dal risultato
+duplicates: 1          // Include solo l'array dei duplicati
+}
+}
+]).toArray();
+
