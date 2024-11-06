@@ -54,3 +54,6 @@ dataset/prepared/first stable version/cities.json
 dataset/prepared/first stable version/POIs.json
 dataset/prepared/first stable version/reviews.json
 dataset/prepared/first stable version/users.json
+/dataset/prepared/dataset1/user_v.json
+/dataset/prepared/user_pre_no_duplicates/users.json
+/dataset/users.json
