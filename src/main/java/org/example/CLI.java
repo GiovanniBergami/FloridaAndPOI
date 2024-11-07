@@ -258,14 +258,15 @@ public class CLI {
         };
     }
     public static void removeUser(){
-        System.out.println("Insert the _id of the user you want to remove");
-        String id_exa = scanner.nextLine();
-        ObjectId id = new ObjectId(id_exa);
-        if(UserConnector.remove(id)){
-            System.out.println("Deleted");
+        System.out.println("Insert the name of the user you want to remove");
+        Document user = UserConnector.findUser(scanner.nextLine());
+        if(user.getString("name").equals("0")){
+            System.out.println("User not found");
         }else{
-            System.out.println("Not deleted, maybe not found");
-        };
+            UserConnector.remove(user.getObjectId("_id"));
+            neoConnector.deleteUser(user.getString("name"));
+        }
+
     }
 
     public static void findUser(){
@@ -307,7 +308,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Go back"),"user> ");
+            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends","See friendship proposal","Go back"),"user> ");
             switch(action){
                 case 1:
                     Document poi = findPOI();
@@ -316,7 +317,7 @@ public class CLI {
                     }else{
                         System.out.println(poi.toJson());
                     }
-                    int c = chooseBetween(List.of("See reviews","Add review","Remove review","Go back"),"user");
+                    int c = chooseBetween(List.of("See reviews","Add review","Remove review","Plan to visit","Go back"),"user");
                     switch(c){
                         case 1:
                             findReviews(poi);
@@ -336,6 +337,10 @@ public class CLI {
                             };
                             break;
                         case 4:
+                            System.out.println("plan to visit");
+                            //si inserisce l'intenzione di visitare. se ci sono coincidenze vengono dette
+                            break;
+                        case 5:
                             break;
                         default:
                             System.out.println("wrong input, retry");
@@ -350,6 +355,34 @@ public class CLI {
                     deleteProfile();
                     break;
                 case 4:
+                    System.out.println("Search user: insert name");
+
+                    //se user viene trovato è possibile proporgli l'amicizia, se non è già amico
+                    break;
+                case 5:
+                    System.out.println("Friends list:");
+                    // è possibile, dato un nome, toglierlo dagli amici
+                    break;
+                case 6:
+                    System.out.println("Friendship proposal:");   //CONTROLLARE SE FUNZIONA
+                    String user = sessionUser.getString("name");
+                    neoConnector.getRequested(user); //SE SPLITTI CLIENT SERVER BISOGNA PASSARE IL RISULTATO
+                    System.out.println("do you want to accept some request?");
+                    switch(chooseBetween(List.of("yes","no"),"")){
+                        case 1:
+                            System.out.println("enter the name of the requester");
+                            String requester = scanner.nextLine();
+                            neoConnector.deleteRequest(requester,user);
+                            neoConnector.addFriendship(requester,user);
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
+
+                    break;
+                case 7:
                     exit = true;
                     break;
                 default:
@@ -454,6 +487,8 @@ public class CLI {
         ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
         POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
 
+        //mettiamo anche la parte della visit sul neo
+        //neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date);
         return true;
     }
 
@@ -485,15 +520,16 @@ public class CLI {
         System.out.println("Insert age");
         age = scanner.nextInt();
         scanner.nextLine();
-        boolean esito = false;
-        if(UserConnector.findUser(username,password,false).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
-            esito = UserConnector.createUser(username,password,age);
+        ObjectId mongoId;
+        if(UserConnector.findUser(username).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
+            mongoId = UserConnector.createUser(username,password,age);
+            neoConnector.addUser(username,mongoId.toString());
         }else{
-            System.out.println("The user already exists");
+            System.out.println("The username is already taken");
         }
 
 
-        return esito;
+        return true;
     }
 
     public static boolean deleteProfile(){
@@ -545,7 +581,7 @@ public class CLI {
             String name1;
             String name2;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
-                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser"),"testing")){
+                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser","addVisit"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -557,18 +593,18 @@ public class CLI {
                     scanner.nextLine();
                     System.out.println("mongoId");
                     String mongoId = scanner.nextLine();
-                    neoConnector.addUser(name,mongoId);
+                    neoConnector.addUser(name,mongoId); //FATTO
                     break;
                 case 3:
                     System.out.println("name1");
                     name1 = scanner.nextLine();
                     System.out.println("name2");
                     name2 = scanner.nextLine();
-                    neoConnector.addFriendship(name1,name2);
+                    neoConnector.addFriendship(name1,name2); //INUTILE
                     break;
                 case 4:
                     System.out.println("name");
-                    neoConnector.deleteUser(scanner.nextLine());
+                    neoConnector.deleteUser(scanner.nextLine()); //implementato
                     break;
                 case 5:
                     System.out.println("name1");
@@ -576,7 +612,7 @@ public class CLI {
                     System.out.println("name2");
                     name2 = scanner.nextLine();
                     neoConnector.deleteFriendship(name1,name2);
-                    neoConnector.deleteFriendship(name2,name1);
+
                     break;
                 case 6:
                     System.out.println("name1");
@@ -609,7 +645,22 @@ public class CLI {
                     break;
                 case 10:
                     //UserConnector.createNeoCollection();
-                    UserConnector.createNeoFriendship();
+                    //UserConnector.createNeoFriendship();
+                    //POIConnector.createNeoCollection();
+                    //POIConnector.createNeoVisits();
+                    break;
+                case 11:
+                    System.out.println("create visit insert poi id");
+                    String poiId = scanner.nextLine();
+                    System.out.println("insert username");
+                    String userName = scanner.nextLine();
+                    System.out.println("insert date");
+                    String date = scanner.nextLine();
+                    System.out.println("stars");
+                    Double stars = scanner.nextDouble();
+                    scanner.nextLine();
+                    neoConnector.addVisit(poiId,userName,stars,date);
+
                     break;
                 default:
                     System.out.println("wrong input");

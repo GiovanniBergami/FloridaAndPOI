@@ -168,8 +168,9 @@ public class POIConnector {
                 List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
                 for(ObjectId review_id: review_ids){
                     review = ReviewConnector.getReview(review_id);
-
-                    neoConnector.addVisit(poi_id,review.getString("name"),review.getInteger("stars")); //aggiungiamo una visita tra il poi e l'user. assumiamo ci sia un indice sul nome dell'user sennò è un casino
+                   // System.out.println(review.toJson());
+                    //System.out.println(review.getString("name"));
+                    neoConnector.addVisit(poi_id,review.getString("username"),review.getDouble("stars"),review.getString("date")); //aggiungiamo una visita tra il poi e l'user. assumiamo ci sia un indice sul nome dell'user sennò è un casino
                 }
 
                 i++;

@@ -127,8 +127,8 @@ public class neoConnector {
             // Esegui la query per creare una relazione di amicizia
             String query = """
                         MATCH (u1:User {name: $userName1}), (u2:User {name: $userName2})
-                        MERGE (u1)-[:FRIENDS]->(u2)
-                        MERGE (u2)-[:FRIENDS]->(u1)
+                        WHERE NOT (u1)-[:FRIENDS]-(u2)
+                        CREATE (u2)-[:FRIENDS]->(u1)
                         RETURN u1, u2
                     """;
 
@@ -176,7 +176,7 @@ public class neoConnector {
     public static void deleteFriendship(String name1,String name2){
         try(Session session = driver.session()){
             String query = """
-                MATCH (u1:User {name: $userName1})-[r:FRIENDS]->(u2:User {name: $userName2})
+                MATCH (u1:User {name: $userName1})-[r:FRIENDS]-(u2:User {name: $userName2})
                 DELETE r
                 RETURN u1, u2
             """;
@@ -241,8 +241,8 @@ public class neoConnector {
             // Esegui la query per creare una relazione di amicizia
             String query = """
                         MATCH (u1:User {mongoId: $userName1}), (u2:User {mongoId: $userName2})
-                        MERGE (u1)-[:FRIENDS]->(u2)
-                        MERGE (u2)-[:FRIENDS]->(u1)
+                        WHERE NOT (u1)-[:FRIENDS]-(u2)
+                        CREATE (u2)-[:FRIENDS]->(u1)
                         RETURN u1, u2
                     """;
 
@@ -263,18 +263,18 @@ public class neoConnector {
         }
     }
 
-    public static void addVisit(String poiId, String name,int stars) {
+    public static void addVisit(String poiId, String name, Double stars, String date) {
         try(Session session = driver.session()) {
             // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
             String query = """
-                        MATCH (u1:POI {mongoId: $poiId}), (u2:User {mongoId: $userName})
-                        MERGE (u1)-[:VISIT{stars:$stars}]->(u2)
-                        MERGE (u2)-[:VISIT{stars:$stars}]->(u1)  
+                        MATCH (u1:POI {mongoId: $poiId}), (u2:User {name: $userName})
+                        WHERE NOT (u1)-[:VISIT{date:$date}]-(u2)
+                        CREATE (u2)-[:VISIT{stars:$stars,date:$date}]->(u1)  
                         RETURN u1, u2
                     """;
-
+//            System.out.println(poiId+" " + name + " " + stars.intValue()+ " " +date);
             Result result = session.run(query,
-                    org.neo4j.driver.Values.parameters("poiId", poiId, "userName", name,"stars",stars));
+                    org.neo4j.driver.Values.parameters("poiId", poiId, "userName", name,"stars",stars.intValue(),"date",date));
 
             //Recupera e stampa i dettagli degli utenti coinvolti
 //            if (result.hasNext()) {
@@ -285,8 +285,6 @@ public class neoConnector {
 //                        user1.get("name").asString() + " e " +
 //                        user2.get("name").asString());
 //            }
-        }catch(Exception e){
-            e.printStackTrace();
         }
     }
 }

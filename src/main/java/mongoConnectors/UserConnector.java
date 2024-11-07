@@ -40,17 +40,14 @@ public class UserConnector {
         return 0;
     }
 
-    public static boolean createUser(String username,String password,int age){
+    public static ObjectId createUser(String username,String password,int age){
         Document doc;
-        if(users.find(eq("name",username)).first() != null) {
-            System.out.println("Username already taken");
-            return false;
-        }
+
         doc =  new Document("name",username)
                 .append("password",password)
                 .append("age",age);
         users.insertOne(doc);
-        return true;
+        return doc.getObjectId("_id");
     }
 
     //READ
