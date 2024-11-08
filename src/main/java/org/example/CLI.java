@@ -599,20 +599,7 @@ public class CLI {
         return r;
     }
 
-    public static Date inputDate(){
-        System.out.println("insert date dd/MM/yyyy");
-        String dateString = scanner.nextLine();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        dateFormat.setLenient(false);
-        Date date;
-        try{
-            date = dateFormat.parse(dateString);
-            return date;
-        } catch (ParseException e) {
-            System.out.println("Invalid date format");
-        }
-        return null;
-    }
+
 
     public static void clearCLI(){
         for(int f = 0;f < 20; f++){
@@ -628,7 +615,8 @@ public class CLI {
             String name1;
             String name2;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
-                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser","addVisit","add plan"),"testing")){
+                    "remove friendship","propose friendship","remove friendship propose","getRequested",
+                    "accept friendship","importUser","addVisit","add plan","remove plan"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -715,9 +703,21 @@ public class CLI {
                     String poiIdd = scanner.nextLine();
                     System.out.println("insert username");
                     String userNamed = scanner.nextLine();
-                    System.out.println("insert date");
+                    System.out.println("insert date yyyy-MM-dd");
                     String dated = scanner.nextLine();
+
                     neoConnector.addPlan(poiIdd,userNamed,dated);
+                    break;
+                case 13:
+                    System.out.println("add plan to visit");
+                    System.out.println("insert poi id");
+                    String poiIdr = scanner.nextLine();
+                    System.out.println("insert username");
+                    String userNamer = scanner.nextLine();
+                    System.out.println("insert date yyyy-MM-dd");
+                    String dater = scanner.nextLine();
+
+                    neoConnector.removePlan(poiIdr,userNamer,dater);
                     break;
                 default:
                     System.out.println("wrong input");
