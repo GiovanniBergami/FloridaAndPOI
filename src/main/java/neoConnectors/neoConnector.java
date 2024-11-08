@@ -365,7 +365,7 @@ public class neoConnector {
             ris.forEach(plan -> {
                 Relationship relationship = plan.get("rel").asRelationship();
 
-                plans.add(""+relationship.get("date")+ plan.get("name").toString());
+                plans.add(""+relationship.get("date")+ plan.get("name").toString()+plan.keys().toString());
             });
         }
         return plans;

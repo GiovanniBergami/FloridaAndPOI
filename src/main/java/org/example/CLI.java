@@ -312,7 +312,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends","See friendship proposal","Go back"),"user> ");
+            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends","See friendship proposal","See plans","Go back"),"user> ");
             switch(action){
                 case 1:
                     Document poi = findPOI();
@@ -415,6 +415,17 @@ public class CLI {
 
                     break;
                 case 7:
+                    List<String> plans =neoConnector.getPlans(sessionUser.getString("name"));
+                    for(String d: plans){
+                        System.out.println(d);
+                    }
+                    System.out.println("do you want to remove one of them?");
+                    if(chooseBetween(List.of("yes","no"),"")==1){
+                        List<String> input = insert(List.of("poi id","date yyyy-MM-dd"));
+                        neoConnector.removePlan(input.get(0),sessionUser.getString("name"),input.get(1));
+                    }
+                    break;
+                case 8:
                     exit = true;
                     break;
                 default:
@@ -699,7 +710,7 @@ public class CLI {
                     neoConnector.removePlan(input.get(0),input.get(1),input.get(2));
                     break;
                 case 14:
-                    data = insert(List.of("username"));
+                    data = insert(List.of("username")); //implementato
                     data =neoConnector.getPlans(data.get(0));
                     for(String d: data){
                         System.out.println(d);
