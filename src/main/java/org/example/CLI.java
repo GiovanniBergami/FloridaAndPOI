@@ -626,7 +626,7 @@ public class CLI {
             List<String> data;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
                     "remove friendship","propose friendship","remove friendship propose","getRequested",
-                    "accept friendship","importUser","addVisit","add plan","remove plan"),"testing")){
+                    "accept friendship","importUser","addVisit","add plan","remove plan","get plans"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -697,6 +697,13 @@ public class CLI {
                 case 13:
                     List<String> input = insert(List.of("poi id","username","date yyyy-MM-dd"));
                     neoConnector.removePlan(input.get(0),input.get(1),input.get(2));
+                    break;
+                case 14:
+                    data = insert(List.of("username"));
+                    data =neoConnector.getPlans(data.get(0));
+                    for(String d: data){
+                        System.out.println(d);
+                    }
                     break;
                 default:
                     System.out.println("wrong input");

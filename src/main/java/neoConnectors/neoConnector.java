@@ -2,12 +2,11 @@ package neoConnectors;
 
 import org.bson.Document;
 import org.neo4j.driver.*;
+import org.neo4j.driver.types.Relationship;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class neoConnector {
@@ -351,6 +350,27 @@ public class neoConnector {
 //            }
         }
     }
+    public static List<String> getPlans(String userName){
+        List<String> plans = new ArrayList<>();
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
+            String query = """
+                        MATCH (u1:User {name: $userName})-[r:PLAN]-(poi)
+                        RETURN r as rel, poi.name as name
+                    """;
+//            System.out.println(poiId+" " + name + " " + stars.intValue()+ " " +date);
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters( "userName", userName));
+            var ris = result.list();
+            ris.forEach(plan -> {
+                Relationship relationship = plan.get("rel").asRelationship();
+
+                plans.add(""+relationship.get("date")+ plan.get("name").toString());
+            });
+        }
+        return plans;
+    }
+
 }
 
 /* CANVAS
