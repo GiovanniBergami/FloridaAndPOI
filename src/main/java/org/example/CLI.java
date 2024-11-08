@@ -5,8 +5,11 @@ import mongoConnectors.POIConnector;
 import mongoConnectors.ReviewConnector;
 import mongoConnectors.UserConnector;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import neoConnectors.neoConnector;
 import org.bson.Document;
@@ -595,6 +598,22 @@ public class CLI {
         //clearCLI();
         return r;
     }
+
+    public static Date inputDate(){
+        System.out.println("insert date dd/MM/yyyy");
+        String dateString = scanner.nextLine();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        dateFormat.setLenient(false);
+        Date date;
+        try{
+            date = dateFormat.parse(dateString);
+            return date;
+        } catch (ParseException e) {
+            System.out.println("Invalid date format");
+        }
+        return null;
+    }
+
     public static void clearCLI(){
         for(int f = 0;f < 20; f++){
             System.out.println();
@@ -609,7 +628,7 @@ public class CLI {
             String name1;
             String name2;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
-                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser","addVisit"),"testing")){
+                    "remove friendship","propose friendship","remove friendship propose","getRequested","accept friendship","importUser","addVisit","add plan"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -647,18 +666,18 @@ public class CLI {
                     name1 = scanner.nextLine();
                     System.out.println("name2");
                     name2 = scanner.nextLine();
-                    neoConnector.addFriendshipRequest(name1,name2);
+                    neoConnector.addFriendshipRequest(name1,name2); //implementato
                     break;
                 case 7:
                     System.out.println("name1");
                     name1 = scanner.nextLine();
                     System.out.println("name2");
                     name2 = scanner.nextLine();
-                    neoConnector.deleteRequest(name1,name2);
+                    neoConnector.deleteRequest(name1,name2); //implementato
                     break;
                 case 8:
                     System.out.println("name");
-                    neoConnector.getRequested(scanner.nextLine());
+                    neoConnector.getRequested(scanner.nextLine()); //implementato
                     break;
                 case 9:
                     System.out.println("enter name");
@@ -669,7 +688,7 @@ public class CLI {
                     System.out.println("enter the name of the one of the request");
                     String requester = scanner.nextLine();
                     neoConnector.deleteRequest(requester,user);
-                    neoConnector.addFriendship(requester,user);
+                    neoConnector.addFriendship(requester,user); //implementato
                     break;
                 case 10:
                     //UserConnector.createNeoCollection();
@@ -689,6 +708,16 @@ public class CLI {
                     scanner.nextLine();
                     neoConnector.addVisit(poiId,userName,stars,date);
 
+                    break;
+                case 12:
+                    System.out.println("add plan to visit");
+                    System.out.println("insert poi id");
+                    String poiIdd = scanner.nextLine();
+                    System.out.println("insert username");
+                    String userNamed = scanner.nextLine();
+                    System.out.println("insert date");
+                    String dated = scanner.nextLine();
+                    neoConnector.addPlan(poiIdd,userNamed,dated);
                     break;
                 default:
                     System.out.println("wrong input");
