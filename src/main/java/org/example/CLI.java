@@ -5,6 +5,7 @@ import mongoConnectors.POIConnector;
 import mongoConnectors.ReviewConnector;
 import mongoConnectors.UserConnector;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -569,6 +570,7 @@ public class CLI {
         switch(c){
             case 1:
                 if(UserConnector.remove(sessionUser.getObjectId("_id"))){
+                    neoConnector.deleteUser(sessionUser.getString("name"));
                     sessionUser = null;
                     System.out.println("User has been deleted");
                     unsignedUser();
@@ -599,7 +601,14 @@ public class CLI {
         return r;
     }
 
-
+    public static List<String> insert(List<String> questions){
+        List<String> answers = new ArrayList<>();
+        for(String question: questions){
+            System.out.println("Insert "+question);
+            answers.add(scanner.nextLine());
+        }
+        return answers;
+    }
 
     public static void clearCLI(){
         for(int f = 0;f < 20; f++){
@@ -614,6 +623,7 @@ public class CLI {
             String name;
             String name1;
             String name2;
+            List<String> data;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
                     "remove friendship","propose friendship","remove friendship propose","getRequested",
                     "accept friendship","importUser","addVisit","add plan","remove plan"),"testing")){
@@ -631,37 +641,25 @@ public class CLI {
                     neoConnector.addUser(name,mongoId); //FATTO
                     break;
                 case 3:
-                    System.out.println("name1");
-                    name1 = scanner.nextLine();
-                    System.out.println("name2");
-                    name2 = scanner.nextLine();
-                    neoConnector.addFriendship(name1,name2); //INUTILE
+                    data = insert(List.of("name1","name2"));
+                    neoConnector.addFriendship(data.get(0),data.get(1));; //INUTILE
                     break;
                 case 4:
                     System.out.println("name");
                     neoConnector.deleteUser(scanner.nextLine()); //implementato
                     break;
                 case 5:
-                    System.out.println("name1");
-                    name1 = scanner.nextLine();
-                    System.out.println("name2");
-                    name2 = scanner.nextLine();
-                    neoConnector.deleteFriendship(name1,name2); //implementato
+                    data = insert(List.of("name1","name2"));
+                    neoConnector.deleteFriendship(data.get(0),data.get(1)); //implementato
 
                     break;
                 case 6:
-                    System.out.println("name1");
-                    name1 = scanner.nextLine();
-                    System.out.println("name2");
-                    name2 = scanner.nextLine();
-                    neoConnector.addFriendshipRequest(name1,name2); //implementato
+                    List<String> ReqNames = insert(List.of("name1","name2"));
+                    neoConnector.addFriendshipRequest(ReqNames.get(0),ReqNames.get(1)); //implementato
                     break;
                 case 7:
-                    System.out.println("name1");
-                    name1 = scanner.nextLine();
-                    System.out.println("name2");
-                    name2 = scanner.nextLine();
-                    neoConnector.deleteRequest(name1,name2); //implementato
+                    List<String> names = insert(List.of("name1","name2"));
+                    neoConnector.deleteRequest(names.get(0),names.get(1)); //implementato
                     break;
                 case 8:
                     System.out.println("name");
@@ -685,39 +683,20 @@ public class CLI {
                     //POIConnector.createNeoVisits();
                     break;
                 case 11:
-                    System.out.println("create visit insert poi id");
-                    String poiId = scanner.nextLine();
-                    System.out.println("insert username");
-                    String userName = scanner.nextLine();
-                    System.out.println("insert date");
-                    String date = scanner.nextLine();
+                    List<String> inp = insert(List.of(" poi id","username","date"));
                     System.out.println("stars");
                     Double stars = scanner.nextDouble();
                     scanner.nextLine();
-                    neoConnector.addVisit(poiId,userName,stars,date);
+                    neoConnector.addVisit(inp.get(0),inp.get(1),stars,inp.get(2));
 
                     break;
                 case 12:
-                    System.out.println("add plan to visit");
-                    System.out.println("insert poi id");
-                    String poiIdd = scanner.nextLine();
-                    System.out.println("insert username");
-                    String userNamed = scanner.nextLine();
-                    System.out.println("insert date yyyy-MM-dd");
-                    String dated = scanner.nextLine();
-
-                    neoConnector.addPlan(poiIdd,userNamed,dated);
+                    List<String> inputs = insert(List.of("poi id","username","date yyyy-MM-dd"));
+                    neoConnector.addPlan(inputs.get(0),inputs.get(1),inputs.get(2));
                     break;
                 case 13:
-                    System.out.println("add plan to visit");
-                    System.out.println("insert poi id");
-                    String poiIdr = scanner.nextLine();
-                    System.out.println("insert username");
-                    String userNamer = scanner.nextLine();
-                    System.out.println("insert date yyyy-MM-dd");
-                    String dater = scanner.nextLine();
-
-                    neoConnector.removePlan(poiIdr,userNamer,dater);
+                    List<String> input = insert(List.of("poi id","username","date yyyy-MM-dd"));
+                    neoConnector.removePlan(input.get(0),input.get(1),input.get(2));
                     break;
                 default:
                     System.out.println("wrong input");
