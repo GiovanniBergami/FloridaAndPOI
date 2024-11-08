@@ -356,24 +356,52 @@ public class CLI {
                     break;
                 case 4:
                     System.out.println("Search user: insert name");
+                    String searchedName= scanner.nextLine();
+                    Document user = UserConnector.findUser(searchedName);
+                    if(user.getString("name").equals("0")){
+                        System.out.println("User not found");
+                    }else{
+                        System.out.println(user.toJson());
+                        System.out.println("Do you want to propose friendship?");
+                        switch(chooseBetween(List.of("Yes","No"),"")){
+                            case 1:
+                                neoConnector.addFriendshipRequest(sessionUser.getString("name"),searchedName);
+                                break;
+                            case 2:
+                                break;
+                            default:
+                                System.out.println("wrong input");
+                        }
+                    }
 
                     //se user viene trovato è possibile proporgli l'amicizia, se non è già amico
                     break;
                 case 5:
                     System.out.println("Friends list:");
-                    // è possibile, dato un nome, toglierlo dagli amici
+                    neoConnector.getFriends(sessionUser.getString("name"));
+                    System.out.println("Do you want to delete a friendship?");
+                    switch(chooseBetween(List.of("Yes","No"),"")){
+                        case 1:
+                            System.out.println("Insert name");
+                            neoConnector.deleteFriendship(sessionUser.getString("name"), scanner.nextLine());
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            System.out.println("wrong input");
+                    }
                     break;
                 case 6:
                     System.out.println("Friendship proposal:");   //CONTROLLARE SE FUNZIONA
-                    String user = sessionUser.getString("name");
-                    neoConnector.getRequested(user); //SE SPLITTI CLIENT SERVER BISOGNA PASSARE IL RISULTATO
+                    String sessionUserName = sessionUser.getString("name");
+                    neoConnector.getRequested(sessionUserName); //SE SPLITTI CLIENT SERVER BISOGNA PASSARE IL RISULTATO
                     System.out.println("do you want to accept some request?");
                     switch(chooseBetween(List.of("yes","no"),"")){
                         case 1:
                             System.out.println("enter the name of the requester");
                             String requester = scanner.nextLine();
-                            neoConnector.deleteRequest(requester,user);
-                            neoConnector.addFriendship(requester,user);
+                            neoConnector.deleteRequest(requester,sessionUserName);
+                            neoConnector.addFriendship(requester,sessionUserName);
                             break;
                         case 2:
                             break;
@@ -611,7 +639,7 @@ public class CLI {
                     name1 = scanner.nextLine();
                     System.out.println("name2");
                     name2 = scanner.nextLine();
-                    neoConnector.deleteFriendship(name1,name2);
+                    neoConnector.deleteFriendship(name1,name2); //implementato
 
                     break;
                 case 6:

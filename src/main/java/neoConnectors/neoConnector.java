@@ -103,6 +103,7 @@ public class neoConnector {
             // Esegui la query per creare una relazione di amicizia
             String query = """
                         MATCH (u1:User {name: $userName1}), (u2:User {name: $userName2})
+                        WHERE NOT (u1)-[:FRIENDS]-(u2)
                         CREATE (u1)-[:REQUESTED]->(u2)
                         RETURN u1, u2
                     """;
@@ -221,6 +222,21 @@ public class neoConnector {
         try(Session session = driver.session()){
             String query = """
                     MATCH (u:User {name : $userName} )-[r:REQUESTED]->(u2: User)
+                    RETURN u2.name as name
+                    """;
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("userName", userName));
+            var ris = result.list();
+            ris.forEach(person -> {
+                System.out.println(person.get("name").asString());
+            });
+        }
+    }
+
+    public static void getFriends(String userName){
+        try(Session session = driver.session()){
+            String query = """
+                    MATCH (u:User {name : $userName} )-[r:FRIENDS]-(u2: User)
                     RETURN u2.name as name
                     """;
             Result result = session.run(query,
