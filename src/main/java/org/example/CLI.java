@@ -418,6 +418,7 @@ public class CLI {
                     List<String> plans =neoConnector.getPlans(sessionUser.getString("name"));
                     for(String d: plans){
                         System.out.println(d);
+                        System.out.println("");
                     }
                     System.out.println("do you want to remove one of them?");
                     if(chooseBetween(List.of("yes","no"),"")==1){
@@ -602,9 +603,10 @@ public class CLI {
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
         for(String option : options){
-            System.out.println(" "+i+" - "+option);
+            System.out.print("    "+option+" ("+i+")");
             i++;
         }
+        System.out.println("");
         //System.out.print(prompt);
         int r = scanner.nextInt();
         scanner.nextLine(); //nextInt leaves a \n into the buffer, so other nextLine will pick up that instead of the actual value
@@ -714,6 +716,7 @@ public class CLI {
                     data =neoConnector.getPlans(data.get(0));
                     for(String d: data){
                         System.out.println(d);
+                        System.out.println("");
                     }
                     break;
                 default:

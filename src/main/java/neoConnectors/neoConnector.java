@@ -363,7 +363,9 @@ public class neoConnector {
                     org.neo4j.driver.Values.parameters( "userName", userName));
             var ris = result.list();
             ris.forEach(plan -> {
-                plans.add(""+ plan.get("rel").get("date") +plan.get("poi").get("name")+ plan.get("poi").get("mongoId"));
+                plans.add("Date: "+ plan.get("rel").get("date").asString()+
+                        "\nWhere: " +plan.get("poi").get("name").asString()+
+                        "\nPOI id: " + plan.get("poi").get("mongoId").asString());
             });
         }
         return plans;
