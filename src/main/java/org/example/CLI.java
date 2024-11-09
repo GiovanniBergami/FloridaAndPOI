@@ -48,7 +48,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Choose option");
-            int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Analytics","Go back"),"admin> ");
+            int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Analytics","Update Plans","Go back"),"admin> ");
             int action = 0;
             switch(collection){
                 case 1:
@@ -193,6 +193,9 @@ public class CLI {
                     }
                     break;
                 case 6:
+                    neoConnector.updatePlans();
+                    break;
+                case 7:
                     exit = true;
                     break;
                 default:
@@ -342,7 +345,10 @@ public class CLI {
                             break;
                         case 4:
                             System.out.println("plan to visit");
-                            //si inserisce l'intenzione di visitare. se ci sono coincidenze vengono dette
+                            System.out.println("Insert date yyyy-MM-dd");
+                            String date = scanner.nextLine();
+                            neoConnector.addPlan(poi.getObjectId("_id").toString(),sessionUser.getString("name"), date);
+                            //sout eventuali coincidenze
                             break;
                         case 5:
                             break;
@@ -708,7 +714,7 @@ public class CLI {
                     neoConnector.addPlan(inputs.get(0),inputs.get(1),inputs.get(2));
                     break;
                 case 13:
-                    List<String> input = insert(List.of("poi id","username","date yyyy-MM-dd"));
+                    List<String> input = insert(List.of("poi id","username","date yyyy-MM-dd")); //implementato
                     neoConnector.removePlan(input.get(0),input.get(1),input.get(2));
                     break;
                 case 14:

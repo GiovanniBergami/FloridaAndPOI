@@ -371,6 +371,17 @@ public class neoConnector {
         return plans;
     }
 
+    public static void updatePlans(){  //remove any plan already expired
+        try(Session session = driver.session()){
+            String query = """
+                        MATCH (:User)-[r:PLAN]->(:POI)
+                        WHERE date(r.date) < date()
+                        DELETE r
+                    """;
+            Result result = session.run(query);
+        }
+    }
+
 }
 
 /* CANVAS
