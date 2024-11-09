@@ -356,16 +356,14 @@ public class neoConnector {
             // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
             String query = """
                         MATCH (u1:User {name: $userName})-[r:PLAN]-(poi)
-                        RETURN r as rel, poi.name as name
+                        RETURN r as rel, poi as poi
                     """;
 //            System.out.println(poiId+" " + name + " " + stars.intValue()+ " " +date);
             Result result = session.run(query,
                     org.neo4j.driver.Values.parameters( "userName", userName));
             var ris = result.list();
             ris.forEach(plan -> {
-                Relationship relationship = plan.get("rel").asRelationship();
-
-                plans.add(""+relationship.get("date")+ plan.get("name").toString()+plan.keys().toString());
+                plans.add(""+ plan.get("rel").get("date") +plan.get("poi").get("name")+ plan.get("poi").get("mongoId"));
             });
         }
         return plans;
