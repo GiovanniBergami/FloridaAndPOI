@@ -257,8 +257,13 @@ public class CLI {
         ObjectId review_id = new ObjectId(scanner.nextLine());
         System.out.println("Insert the _id of the POI of the review");
         ObjectId poi_id = new ObjectId(scanner.nextLine());
+        System.out.println("insert user name");
+        String userName = scanner.nextLine();
+        System.out.println("insert date");
+        String date = scanner.nextLine();
         if(ReviewConnector.remove(review_id,"")){
             POIConnector.removeReviewFromPOI(poi_id,review_id);
+            neoConnector.removeVisit(poi_id.toString(),userName,date);
             System.out.println("Deleted");
         }else{
             System.out.println("Not deleted, maybe not found");
