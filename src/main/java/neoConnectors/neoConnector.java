@@ -350,6 +350,30 @@ public class neoConnector {
 //            }
         }
     }
+
+    public static void removeVisit(String poiId, String name,  String date) {
+        try(Session session = driver.session()) {
+            // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
+            String query = """
+                        MATCH (u1:POI {mongoId: $poiId})-[r:VISIT{date:$date}]-(u2:User {name: $userName})
+                        DELETE  r  
+                        RETURN u1, u2
+                    """;
+//            System.out.println(poiId+" " + name + " " + stars.intValue()+ " " +date);
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("poiId", poiId, "userName", name,"date",date));
+
+            //Recupera e stampa i dettagli degli utenti coinvolti
+//            if (result.hasNext()) {
+//                var record = result.single();
+//                var user1 = record.get(0).asNode();
+//                var user2 = record.get(1).asNode();
+//                System.out.println("Relazione di amicizia creata tra: " +
+//                        user1.get("name").asString() + " e " +
+//                        user2.get("name").asString());
+//            }
+        }
+    }
     public static List<String> getPlans(String userName){
         List<String> plans = new ArrayList<>();
         try(Session session = driver.session()) {

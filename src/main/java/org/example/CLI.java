@@ -313,6 +313,7 @@ public class CLI {
 
     public static void user(){
         boolean exit = false;
+        List<String> data;
         while(!exit){
             System.out.println("Which action do you want to take?");
             int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends","See friendship proposal","See plans","Go back"),"user> ");
@@ -333,12 +334,13 @@ public class CLI {
                             addReview(poi);
                             break;
                         case 3:
-                            System.out.println("Insert the _id of the review you want to remove");
-                            String id_exa = scanner.nextLine();
-                            ObjectId review_id = new ObjectId(id_exa);
+                            data = insert(List.of("Insert the _id of the review you want to remove","date"));
+//                            String id_exa = scanner.nextLine();
+                            ObjectId review_id = new ObjectId(data.get(0));
                             if(ReviewConnector.remove(review_id,sessionUser.getString("name"))){
                                 System.out.println("Deleted");
                                 POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
+                                neoConnector.removeVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),data.get(1));
                             }else{
                                 System.out.println("Not deleted, maybe not found");
                             };
@@ -536,9 +538,7 @@ public class CLI {
         String text = scanner.nextLine();
         ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
         POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
-
-        //mettiamo anche la parte della visit sul neo
-        //neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date);
+        neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date);
         return true;
     }
 
@@ -710,7 +710,7 @@ public class CLI {
 
                     break;
                 case 12:
-                    List<String> inputs = insert(List.of("poi id","username","date yyyy-MM-dd"));
+                    List<String> inputs = insert(List.of("poi id","username","date yyyy-MM-dd")); //implementato
                     neoConnector.addPlan(inputs.get(0),inputs.get(1),inputs.get(2));
                     break;
                 case 13:

@@ -95,7 +95,7 @@ public class ReviewConnector {
                 return false;
             }
         }else{
-            System.out.println(name);
+
             Document filter = new Document("_id",id)
                     .append("username",name);
             DeleteResult result = reviews.deleteOne(filter);
