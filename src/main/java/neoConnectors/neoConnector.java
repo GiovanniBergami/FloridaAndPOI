@@ -407,6 +407,25 @@ public class neoConnector {
             Result result = session.run(query);
         }
     }
+    public static void deletePOI(String mongoIdToRemove){
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u:POI {mongoId: $mongoId})
+                DETACH DELETE u
+                RETURN u
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("mongoId", mongoIdToRemove));
+
+            // Controlla se l'utente è stato effettivamente rimosso
+            if (result.hasNext()) {
+                System.out.println("poi rimosso da neo: " + mongoIdToRemove);
+            } else {
+                System.out.println("Nessun poi trovato con il nome: " + mongoIdToRemove);
+            }
+        }
+    }
 
 }
 

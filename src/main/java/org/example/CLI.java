@@ -224,6 +224,7 @@ public class CLI {
                 String address = scanner.nextLine();
                 ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
                 CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"),newPOIId);
+                neoConnector.addPOI(name,newPOIId.toString());
                 System.out.println("The POI has been added");
             }
         }
@@ -243,10 +244,13 @@ public class CLI {
         if(POIConnector.remove(id)){
             System.out.println("Deleted");
             List<ObjectId> review_ids = poi.getList("review_ids",ObjectId.class);
-            for(ObjectId review_id : review_ids){
-                ReviewConnector.remove(review_id,"");
+            if(review_ids!=null){
+                for(ObjectId review_id : review_ids){
+                    ReviewConnector.remove(review_id,"");
+                }
             }
             CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"));
+            neoConnector.deletePOI(id.toString());
         }else{
             System.out.println("Not deleted");
         };
