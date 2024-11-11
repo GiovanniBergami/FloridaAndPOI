@@ -10,9 +10,13 @@ public class Main {
     public static void main(String[] args) {
         neoConnector.connect();
         CLI.unsignedUser();
+        exit();
+    }
+    public static void exit(){
         mongoConnector.close();
         CLI.scanner.close();
         neoConnector.close();
+        System.exit(0);
     }
 }
 

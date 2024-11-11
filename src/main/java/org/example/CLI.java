@@ -484,7 +484,7 @@ public class CLI {
                     neoSperimental();
                     break;
                 case 6:
-                    exit = true;
+                    Main.exit();
                     break;
                 default:
                     System.out.println("wrong input, retry");

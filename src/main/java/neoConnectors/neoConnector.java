@@ -83,6 +83,8 @@ public class neoConnector {
 //            var createdUser = result.single().get(0).asNode();
 //            System.out.println("Utente creato: " + createdUser.get("name").asString() +
 //                    ", mongoId: "+ createdUser.get("mongoId"));
+        }catch(Exception e){
+            System.out.println(e.getMessage());
         }
     }
 
