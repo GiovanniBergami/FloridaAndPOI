@@ -467,6 +467,30 @@ public class neoConnector {
         }
         return coincidences;
     }
+    public static List<String> recommendPOI(String userName){
+        List<String> recommendations = new ArrayList<>();
+        System.out.println(userName);
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u:User{name:$userName})-[:FRIENDS]-(f:User)-[v:VISIT]-(p:POI)
+                RETURN f.name as friend, p as poi , v.stars as stars
+                ORDER BY stars DESC
+                LIMIT 10
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters( "userName",userName));
+
+            var ris = result.list();
+            ris.forEach(r -> {
+                recommendations.add("Friend Name: "+ r.get("friend").asString()+
+                        "   POI: " + r.get("poi").get("name").asString()+ " "+r.get("poi").get("mongoId").asString()+
+                        " stars: "+r.get("stars").toString());
+            });
+
+        }
+        return recommendations;
+    }
 
 }
 
