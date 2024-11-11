@@ -381,7 +381,11 @@ public class CLI {
 
                     break;
                 case 2:
-                    System.out.println("to do");
+                    data = neoConnector.recommendPOI(sessionUser.getString("name"));
+                    for(String d: data){
+                        System.out.println(d);
+                        //System.out.println("");
+                    }
                     break;
                 case 3:
                     deleteProfile();
@@ -665,7 +669,7 @@ public class CLI {
             List<String> data;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
                     "remove friendship","propose friendship","remove friendship propose","getRequested",
-                    "accept friendship","importUser","addVisit","add plan","remove plan","get plans","recommend"),"testing")){
+                    "accept friendship","importUser","addVisit","add plan","remove plan","get plans","recommend","similar"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -748,6 +752,14 @@ public class CLI {
                 case 15:
                     data = insert(List.of("username"));
                     data = neoConnector.recommendPOI(data.get(0));
+                    for(String d: data){
+                        System.out.println(d);
+                        //System.out.println("");
+                    }
+                    break;
+                case 16:
+                    data = insert(List.of("username"));
+                    data = neoConnector.similarUser(data.get(0));
                     for(String d: data){
                         System.out.println(d);
                         //System.out.println("");
