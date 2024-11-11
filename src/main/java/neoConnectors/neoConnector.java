@@ -427,6 +427,47 @@ public class neoConnector {
         }
     }
 
+    public static void updatePOI(String mongoId,String newName){
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (u:POI {mongoId: $mongoId})
+                SET u.name = $newName
+                RETURN u
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("mongoId", mongoId, "newName",newName));
+
+            // Controlla se l'utente è stato effettivamente rimosso
+            if (result.hasNext()) {
+                System.out.println("poi aggiornato su neo: " + mongoId);
+            } else {
+                System.out.println("Nessun poi trovato con il nome: " + mongoId);
+            }
+        }
+    }
+
+    public static List<String> findCoincidence(String mongoId,String userName){
+        List<String> coincidences = new ArrayList<>();
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (p:POI {mongoId: $mongoId})<-[r:PLAN]-(f:User)-[:FRIENDS]-(u:User{name : $username})
+                RETURN f as friend,r as rel
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters("mongoId", mongoId, "username",userName));
+
+            var ris = result.list();
+            ris.forEach(plan -> {
+                coincidences.add("Date: "+ plan.get("rel").get("date").asString()+
+                        "   User: " + plan.get("friend").get("name").asString());
+            });
+
+        }
+        return coincidences;
+    }
+
 }
 
 /* CANVAS

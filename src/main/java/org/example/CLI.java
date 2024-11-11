@@ -309,7 +309,9 @@ public class CLI {
                     System.out.println("enter the value");
                     String value = scanner.nextLine();
                     POIConnector.updateFieldPOI(poi.getObjectId("_id"),field,value);
-
+                    if(field.equals("name")){
+                        neoConnector.updatePOI(poi.getObjectId("_id").toString(),value);
+                    }
                     break;
                 case 2:
                     exit = true;
@@ -356,6 +358,15 @@ public class CLI {
                             break;
                         case 4:
                             System.out.println("plan to visit");
+                            System.out.println("Coincidences found among your frinds:");
+                            data = neoConnector.findCoincidence(poi.getObjectId("_id").toString(),sessionUser.getString("name"));
+                            if(data.size()!=0){
+                                for(String coincidence : data){
+                                    System.out.println(coincidence);
+                                }
+                            }else{
+                                System.out.println("no coincidence found");
+                            }
                             System.out.println("Insert date yyyy-MM-dd");
                             String date = scanner.nextLine();
                             neoConnector.addPlan(poi.getObjectId("_id").toString(),sessionUser.getString("name"), date);
