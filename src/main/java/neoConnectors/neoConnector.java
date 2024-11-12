@@ -491,15 +491,15 @@ public class neoConnector {
         }
         return recommendations;
     }
-    public static List<String> similarUser(String userName){
+    public static List<String> similarUser(String userName){ //provarla con Jfliv
         List<String> similars = new ArrayList<>();
 
         try(Session session = driver.session()){
             String query = """
                 MATCH (u1:User{name:$userName})-[v1:VISIT]->(p:POI)<-[v2:VISIT]-(u2:User)
                 WHERE u1.name <> u2.name
-                AND abs(v1.stars - v2.stars) < 2
-                WITH u1,u2,COLLECT(DISTINCT p.mongoId) as commonPOIs, COUNT(p) as count
+                AND abs(v1.stars - v2.stars) < 3
+                WITH u1,u2,COLLECT(DISTINCT {mongoId: p.mongoId,POIname: p.name}) as commonPOIs, COUNT(p) as count
                 RETURN u2.name as name, commonPOIs as commonPOIs, count as count
                 ORDER BY count DESC
                 LIMIT 10
@@ -512,8 +512,9 @@ public class neoConnector {
             var ris = result.list();
             ris.forEach(r -> {
                 similars.add("Username: "+ r.get("name").asString()+
-                        " count: "+r.get("count").toString());
-                System.out.println(r.get("commonPOIs").asList().get(1).toString()); //da qui
+                        " count: "+r.get("count").toString()+
+                        "poi: "+ r.get("commonPOIs").asList());
+
             });
 
         }
