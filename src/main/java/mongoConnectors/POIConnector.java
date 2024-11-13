@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -176,6 +177,23 @@ public class POIConnector {
                 i++;
             }
             System.out.println(i);
+        }
+    }
+    public static void cityStatistics(String cityName){
+        //per una città si può vedere per ogni poi il numero di reviews, l'average rating, il numero di reviews e avg rating divisi per fascia di età della popolazione
+
+
+        List<Document> pipeline = Arrays.asList(
+                new Document("$match",new Document("city",cityName)),
+                new Document("$project",new Document("sumStars",1)
+                        .append("visit",1)
+                        .append("name",1)
+                        .append("_id",0))
+        );
+        AggregateIterable<Document> results = POIs.aggregate(pipeline);
+
+        for(Document doc : results){
+            System.out.println(doc.toJson());
         }
     }
 

@@ -520,6 +520,28 @@ public class neoConnector {
         }
         return similars;
     }
+    public static List<String> findFriendPlans(String userName){
+        List<String> coincidences = new ArrayList<>();
+        try(Session session = driver.session()){
+            String query = """
+                MATCH (p:POI)<-[r:PLAN]-(f:User)-[:FRIENDS]-(u:User{name : $username})
+                RETURN f as friend,r as rel, p as poi
+            """;
+
+            Result result = session.run(query,
+                    org.neo4j.driver.Values.parameters( "username",userName));
+
+            var ris = result.list();
+            ris.forEach(plan -> {
+                coincidences.add("POI name: "+plan.get("poi").get("name").asString()+
+                        "POI id: "+plan.get("poi").get("mongoId").asString()+
+                        "Date: "+ plan.get("rel").get("date").asString()+
+                        "   User: " + plan.get("friend").get("name").asString());
+            });
+
+        }
+        return coincidences;
+    }
 
 }
 

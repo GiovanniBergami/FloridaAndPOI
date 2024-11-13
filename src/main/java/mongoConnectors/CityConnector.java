@@ -1,5 +1,6 @@
 package mongoConnectors;
 
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.DeleteResult;
@@ -9,6 +10,8 @@ import org.bson.types.ObjectId;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;

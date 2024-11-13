@@ -50,6 +50,7 @@ public class CLI {
             System.out.println("Choose option");
             int collection = chooseBetween(List.of("POIs","Reviews","Users","Cities","Analytics","Update Plans","Go back"),"admin> ");
             int action = 0;
+            List<String> data;
             switch(collection){
                 case 1:
                     action = chooseBetween(List.of("Create one","Read one","Update one","Delete one",
@@ -181,6 +182,8 @@ public class CLI {
                     System.out.println("Analytics");
                     switch(chooseBetween(List.of("query1","query2","query3"),"")){
                         case 1:
+                            data = insert(List.of("city"));
+                            POIConnector.cityStatistics(data.get(0));
                             break;
                         case 2:
                             System.out.println("todo");
@@ -327,7 +330,8 @@ public class CLI {
         List<String> data;
         while(!exit){
             System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends","See friendship proposal","See plans","Go back"),"user> ");
+            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends",
+                    "See friendship proposal","See plans","propose similar users","see friends plans","Go back"),"user> ");
             switch(action){
                 case 1:
                     Document poi = findPOI();
@@ -459,6 +463,17 @@ public class CLI {
                     }
                     break;
                 case 8:
+                    data = neoConnector.similarUser(sessionUser.getString("name"));
+                    for(String d: data)
+                        System.out.println(d);
+                    break;
+                case 9:
+                    data = neoConnector.findFriendPlans(sessionUser.getString("name"));
+                    for(String d: data){
+                        System.out.println(d);
+                    }
+                    break;
+                case 10:
                     exit = true;
                     break;
                 default:
@@ -632,8 +647,15 @@ public class CLI {
 
     public static int chooseBetween(List<String> options,String prompt){
         int i = 1;
+        System.out.print("    ");
         for(String option : options){
-            System.out.print("    "+option+" ("+i+")");
+            System.out.print(option+" ("+i+")");
+            for(int j = 0; j < (30 - option.length() - i/10);j++)
+                System.out.print(" ");
+            if(i%5==0){
+                System.out.println("");
+                System.out.print("    ");
+            }
             i++;
         }
         System.out.println("");
@@ -669,7 +691,7 @@ public class CLI {
             List<String> data;
             switch(chooseBetween(List.of("go back","insert user","insert friendship","remove user",
                     "remove friendship","propose friendship","remove friendship propose","getRequested",
-                    "accept friendship","importUser","addVisit","add plan","remove plan","get plans","recommend","similar"),"testing")){
+                    "accept friendship","importUser","addVisit","add plan","remove plan","get plans","recommend","similar","friend plans"),"testing")){
                 case 1:
                     exit = true;
                     break;
@@ -758,8 +780,16 @@ public class CLI {
                     }
                     break;
                 case 16:
-                    data = insert(List.of("username"));
+                    data = insert(List.of("username"));  //implementato
                     data = neoConnector.similarUser(data.get(0));
+                    for(String d: data){
+                        System.out.println(d);
+                        //System.out.println("");
+                    }
+                    break;
+                case 17:
+                    data = insert(List.of("username"));  //implementato
+                    data = neoConnector.findFriendPlans(data.get(0));
                     for(String d: data){
                         System.out.println(d);
                         //System.out.println("");

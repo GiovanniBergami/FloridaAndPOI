@@ -124,3 +124,31 @@ duplicates: 1          // Include solo l'array dei duplicati
 }
 ]).toArray();
 
+INSERISCI CUMULATA DELLE STELLE NEI POI
+
+for (const poi of db.POIs.find()) {
+// Verifica che reviews_ids sia un array
+if (Array.isArray(poi.reviews_ids) && poi.reviews_ids.length > 0) {
+let sumStars = 0;
+
+        // Itera su ciascun ID di recensione e recupera la recensione per sommare le stelle
+        for (const reviewId of poi.reviews_ids) {
+            const review = db.reviews.findOne({ _id: reviewId });
+            if (review && review.stars) {
+                sumStars += review.stars;
+            }
+        }
+
+        // Aggiorna il POI con la somma delle stelle
+        db.POIs.updateOne(
+            { _id: poi._id },
+            { $set: { sumStars: sumStars } }
+        );
+    } else {
+        // Se reviews_ids non è un array o è vuoto, imposta sumStars a 0
+        db.POIs.updateOne(
+            { _id: poi._id },
+            { $set: { sumStars: 0 } }
+        );
+    }
+}
