@@ -58,3 +58,7 @@ dataset/prepared/first stable version/users.json
 /dataset/prepared/user_pre_no_duplicates/users.json
 /dataset/users.json
 /dataset/poi_with_sumStars.json
+/dataset/poi_withStarForAgesNew.json
+/dataset/poi_with_starForAges.json
+/dataset/poi_aggregated_renamed.json
+/dataset/poi_aggregated.json

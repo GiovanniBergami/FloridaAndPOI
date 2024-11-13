@@ -185,14 +185,32 @@ public class POIConnector {
 
         List<Document> pipeline = Arrays.asList(
                 new Document("$match",new Document("city",cityName)),
-                new Document("$project",new Document("sumStars",1)
+                new Document("$project",new Document("reviews_count_for_age",1)
                         .append("reviews_count",1)
                         .append("name",1)
+                        .append("sumStars",1)
                         .append("_id",0))
-                        .append("reviewsCounts",1)
+
         );
         AggregateIterable<Document> results = POIs.aggregate(pipeline);
 
+
+        for(Document doc : results){
+            if(doc.getInteger("reviews_count").intValue()==0){
+                System.out.println("Name: " + doc.getString("name") +
+                        " ".repeat(30 - doc.getString("name").length())+
+                        "avg stars: Nessuna recensione");
+            }else {
+                System.out.println("Name: " + doc.getString("name") +
+                        " ".repeat(30 - doc.getString("name").length())+
+                        //"avg stars: " + ((float) doc.getInteger("sumStars").intValue()) / ((float) doc.getInteger("reviews_count").intValue())+
+                        "\n visits by age: "+
+                        "\n stars by age: "
+                );
+            }
+        System.out.println(doc.getList("reviews_count_for_age", Integer.class));
+        System.out.println(doc.getList("sumStars", Integer.class));
+        }
 
 //        results.into(new ArrayList<>())
         return;
