@@ -186,15 +186,16 @@ public class POIConnector {
         List<Document> pipeline = Arrays.asList(
                 new Document("$match",new Document("city",cityName)),
                 new Document("$project",new Document("sumStars",1)
-                        .append("visit",1)
+                        .append("reviews_count",1)
                         .append("name",1)
                         .append("_id",0))
+                        .append("reviewsCounts",1)
         );
         AggregateIterable<Document> results = POIs.aggregate(pipeline);
 
-        for(Document doc : results){
-            System.out.println(doc.toJson());
-        }
+
+//        results.into(new ArrayList<>())
+        return;
     }
 
 }

@@ -152,3 +152,60 @@ let sumStars = 0;
         );
     }
 }
+
+CUMULATA CON ARRAY PER ETà
+
+// Definisce i limiti degli scaglioni di età
+const ageRanges = [15, 30, 50, 70, Infinity]; // Limiti delle fasce di età
+let c = 0;
+for (const poi of db.POIs.find()) {
+// Inizializza gli array per conteggi di recensioni e somme di stelle per ogni fascia d'età
+let reviewCounts = [0, 0, 0, 0, 0];  // Contatore recensioni per ogni fascia
+let sumStars = [0, 0, 0, 0, 0];      // Somma delle stelle per ogni fascia
+c += 1;
+if(c%100 === 0){
+console.log(`Elaborati ${c} POI...`);
+}
+// Verifica che reviews_ids sia un array e abbia elementi
+if (Array.isArray(poi.review_ids) && poi.review_ids.length > 0) {
+
+        // Itera su ciascun ID di recensione
+        for (const reviewId of poi.review_ids) {
+            const review = db.reviews.findOne({ _id: reviewId });
+
+            if (review && review.stars && review.username) {
+                const user = db.users.findOne({ name: review.username });
+
+                if (user && typeof user.age === 'number') {
+                    // Determina l'indice della fascia di età appropriata per l'utente
+                    let ageIndex = ageRanges.findIndex(range => user.age < range);
+
+                    // Aggiunge il valore di stelle alla somma e incrementa il conteggio per quella fascia
+                    if (ageIndex !== -1) {
+                        sumStars[ageIndex] += review.stars;
+                        reviewCounts[ageIndex] += 1;
+                    }
+                }
+            }
+        }
+
+        // Aggiorna il POI con gli array di somme delle stelle e conteggi per ciascuna fascia d'età
+        db.POIs.updateOne(
+            { _id: poi._id },
+            { $set: {
+                sumStars: sumStars,
+                reviewCounts: reviewCounts
+            }}
+        );
+
+    } else {
+        // Se reviews_ids non è un array o è vuoto, imposta sumStars e reviewCounts a array di zeri
+        db.POIs.updateOne(
+            { _id: poi._id },
+            { $set: {
+                sumStars: [0, 0, 0, 0, 0],
+                reviewCounts: [0, 0, 0, 0, 0]
+            }}
+        );
+    }
+}
