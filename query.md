@@ -47,3 +47,29 @@ db.POIs.aggregate([
 ])
 
 QUERY IN JAVA: VEDI CODICE
+
+GET BEST POI FOR AGE ACROSS CITIES
+
+const ageIndex = 2;
+db.POIs.aggregate([
+{
+$match: {
+[`reviews_count_for_age.${ageIndex}`]: { $gt: 0 }
+}
+},
+{
+$group: {
+_id: "$city",
+maxReviewsCount: { $max: { $arrayElemAt: ["$reviews_count_for_age", ageIndex] } },
+poiName: { $first: "$name" },
+poiId: { $first: "$_id" }
+}
+},
+{
+$project: {
+city: "$_id",
+poiName: 1,
+reviewsCountForAge: "$maxReviewsCount"
+}
+}
+]);
