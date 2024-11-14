@@ -62,3 +62,7 @@ dataset/prepared/first stable version/users.json
 /dataset/poi_with_starForAges.json
 /dataset/poi_aggregated_renamed.json
 /dataset/poi_aggregated.json
+/dataset/prepared/v2/cities.json
+/dataset/prepared/v2/pois.json
+/dataset/prepared/v2/reviews.json
+/dataset/prepared/v2/users.json

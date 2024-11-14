@@ -179,7 +179,7 @@ public class POIConnector {
             System.out.println(i);
         }
     }
-    public static void cityStatistics(String cityName){
+    public static String cityStatistics(String cityName){
         //per una città si può vedere per ogni poi il numero di reviews, l'average rating, il numero di reviews e avg rating divisi per fascia di età della popolazione
 
 
@@ -188,32 +188,42 @@ public class POIConnector {
                 new Document("$project",new Document("reviews_count_for_age",1)
                         .append("reviews_count",1)
                         .append("name",1)
-                        .append("sumStars",1)
+                        .append("stars",1)
+                        .append("totStars",1)
                         .append("_id",0))
 
         );
         AggregateIterable<Document> results = POIs.aggregate(pipeline);
-
+        String output = "";
 
         for(Document doc : results){
-            if(doc.getInteger("reviews_count").intValue()==0){
-                System.out.println("Name: " + doc.getString("name") +
+            if(doc.getInteger("reviews_count")==0){
+                output = output +"\nName: " + doc.getString("name") +
                         " ".repeat(30 - doc.getString("name").length())+
-                        "avg stars: Nessuna recensione");
+                        "avg stars: Nessuna recensione";
             }else {
-                System.out.println("Name: " + doc.getString("name") +
+                output = output + "\nName: " + doc.getString("name") +
                         " ".repeat(30 - doc.getString("name").length())+
-                        //"avg stars: " + ((float) doc.getInteger("sumStars").intValue()) / ((float) doc.getInteger("reviews_count").intValue())+
-                        "\n visits by age: "+
-                        "\n stars by age: "
-                );
+                        "avg stars: " + ((float) doc.getInteger("totStars")) / ((float) doc.getInteger("reviews_count"))+
+                        "   n reviews: "+ doc.getInteger("reviews_count")+
+                        "   tot stars: "+ doc.getInteger("totStars")+
+                        "\n visits by age: "+ doc.getList("reviews_count_for_age", Integer.class).toString() +
+                        "\n tot stars by age: "+ doc.getList("stars", Integer.class).toString() +
+                        "\n stars by age: " + Arrays.toString(divideArrays(doc.getList("stars", Integer.class), doc.getList("reviews_count_for_age", Integer.class)));
             }
-        System.out.println(doc.getList("reviews_count_for_age", Integer.class));
-        System.out.println(doc.getList("sumStars", Integer.class));
+
         }
 
+
 //        results.into(new ArrayList<>())
-        return;
+        return output;
+    }
+    public static float[] divideArrays(List<Integer> a, List<Integer> b){
+        float[] r = new float[a.size()];
+        for(int i = 0;i<a.size();i++){
+            r[i] = ((float)a.get(i))/((float)b.get(i));
+        }
+        return r;
     }
 
 }

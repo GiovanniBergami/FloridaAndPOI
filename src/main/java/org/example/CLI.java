@@ -183,23 +183,7 @@ public class CLI {
                     switch(chooseBetween(List.of("citiStatistics","query2","query3"),"")){
                         case 1:
                             data = insert(List.of("city"));
-                            //List<Document> results = POIConnector.cityStatistics(data.get(0));
-                            POIConnector.cityStatistics(data.get(0));
-//                            for(Document doc: results){
-//
-////                            for(Document doc : results){
-////                                if(doc.getInteger("reviews_count").intValue()==0){
-////                                    System.out.println("Name: " + doc.getString("name") +
-////                                            " ".repeat(30 - doc.getString("name").length())+
-////                                            "avg stars: Nessuna recensione");
-////                                }else {
-////                                    System.out.println("Name: " + doc.getString("name") +
-////                                            " ".repeat(30 - doc.getString("name").length())+
-////                                            "avg stars: " + ((float) doc.getInteger("sumStars").intValue()) / ((float) doc.getInteger("reviews_count").intValue())
-////                                    );
-////                                }
-//                                System.out.println(doc.getString("name")+doc.getList("sumStars", Integer.class));
-//                            }
+                            System.out.println(POIConnector.cityStatistics(data.get(0)));
                             break;
                         case 2:
                             System.out.println("todo");
