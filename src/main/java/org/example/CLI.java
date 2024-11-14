@@ -183,10 +183,10 @@ public class CLI {
                     switch(chooseBetween(List.of("citiStatistics","query2","query3"),"")){
                         case 1:
                             data = insert(List.of("city"));
-                            System.out.println(POIConnector.cityStatistics(data.get(0)));
+                            System.out.println(POIConnector.poiOfCityStatistics(data.get(0)));
                             break;
                         case 2:
-                            System.out.println("todo");
+
                             break;
                         case 3:
                             System.out.println("todoo");

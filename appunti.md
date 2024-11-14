@@ -209,3 +209,21 @@ if (Array.isArray(poi.review_ids) && poi.review_ids.length > 0) {
         );
     }
 }
+
+SOMMA ELEMENTI IN ARRAY
+
+db.POIs.updateMany(
+{},
+[
+{ $set: {
+"totStars": {
+$reduce: {
+input: "$sumStars",
+initialValue: 0,
+in: { $add: ["$$value", "$$this"] }
+}
+}
+}}
+]
+);
+

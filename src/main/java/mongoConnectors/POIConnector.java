@@ -179,7 +179,7 @@ public class POIConnector {
             System.out.println(i);
         }
     }
-    public static String cityStatistics(String cityName){
+    public static String poiOfcityStatisticsDeprecated(String cityName){
         //per una città si può vedere per ogni poi il numero di reviews, l'average rating, il numero di reviews e avg rating divisi per fascia di età della popolazione
 
 
@@ -224,6 +224,48 @@ public class POIConnector {
             r[i] = ((float)a.get(i))/((float)b.get(i));
         }
         return r;
+    }
+    public static String poiOfCityStatistics(String cityName){
+        List<Document> pipeline = Arrays.asList(
+                // Filtro per città
+                new Document("$match", new Document("city", cityName)),
+
+                // Proiezione dei campi con calcoli sui rapporti
+                new Document("$project", new Document()
+                        .append("name", 1)
+                        .append("city", 1)
+                        .append("totStars", 1)
+                        .append("reviews_count", 1)
+                        .append("avgStars", new Document("$cond", new Document()
+                                .append("if", new Document("$gt", Arrays.asList("$reviews_count", 0)))
+                                .append("then", new Document("$divide", Arrays.asList("$totStars", "$reviews_count")))
+                                .append("else", 0)
+                        ))
+                        .append("ageGroupAvgStars", new Document("$map", new Document()
+                                .append("input", new Document("$range", Arrays.asList(0, new Document("$size", "$stars"))))
+                                .append("as", "index")
+                                .append("in", new Document("$cond", new Document()
+                                        .append("if", new Document("$gt", Arrays.asList(
+                                                new Document("$arrayElemAt", Arrays.asList("$reviews_count_for_age", "$$index")), 0
+                                        )))
+                                        .append("then", new Document("$divide", Arrays.asList(
+                                                new Document("$arrayElemAt", Arrays.asList("$stars", "$$index")),
+                                                new Document("$arrayElemAt", Arrays.asList("$reviews_count_for_age", "$$index"))
+                                        )))
+                                        .append("else", 0)
+                                ))
+                        ))
+                )
+        );
+
+        // Esecuzione della query di aggregazione
+        AggregateIterable<Document> results = POIs.aggregate(pipeline);
+        String output = "";
+        // Iterazione e stampa dei risultati
+        for (Document doc : results) {
+            output = output + doc.toJson() + "\n";
+        }
+        return output;
     }
 
 }
