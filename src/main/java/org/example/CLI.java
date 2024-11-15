@@ -186,7 +186,10 @@ public class CLI {
                             System.out.println(POIConnector.poiOfCityStatistics(data.get(0)));
                             break;
                         case 2:
-
+                            System.out.println("insert age span");
+                            int ageSpan = scanner.nextInt();
+                            scanner.nextLine();
+                            System.out.println(POIConnector.bestPOIForAge(ageSpan));
                             break;
                         case 3:
                             System.out.println("todoo");

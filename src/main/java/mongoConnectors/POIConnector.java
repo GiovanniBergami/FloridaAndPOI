@@ -267,5 +267,40 @@ public class POIConnector {
         }
         return output;
     }
+    public static String bestPOIForAge(int ageSpan){
+        int ageIndex = ageSpan; // Ad esempio, la terza fascia di età
+
+        // Pipeline di aggregazione
+        List<Document> pipeline = Arrays.asList(
+                // Proiezione per estrarre la città e il valore `reviews_count_for_age[ageIndex]`
+                new Document("$project", new Document()
+                        .append("name", 1)
+                        .append("city", 1)
+                        .append("reviews_count_for_age", new Document("$arrayElemAt", Arrays.asList("$reviews_count_for_age", ageIndex)))
+                ),
+
+                // Ordinamento per `reviews_count_for_age` in ordine decrescente
+                new Document("$sort", new Document("reviews_count_for_age", -1)),
+
+                // Raggruppamento per città, selezionando il POI con il valore massimo
+                new Document("$group", new Document()
+                        .append("_id", "$city")
+                        .append("topPOI", new Document("$first", "$name"))
+                        .append("maxReviewsForAge", new Document("$first", "$reviews_count_for_age"))
+                ),
+
+                // Ordinamento finale opzionale
+                new Document("$sort", new Document("_id", 1))
+        );
+
+        // Esecuzione della query di aggregazione
+        AggregateIterable<Document> results = POIs.aggregate(pipeline);
+        String output = "";
+        // Iterazione e stampa dei risultati
+        for (Document doc : results) {
+            output = output + doc.toJson() + "\n";
+        }
+        return output;
+    }
 
 }
