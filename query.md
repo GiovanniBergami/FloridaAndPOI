@@ -50,26 +50,33 @@ QUERY IN JAVA: VEDI CODICE
 
 GET BEST POI FOR AGE ACROSS CITIES
 
-const ageIndex = 2;
+// Parametro dell'indice di fascia di età, impostato dall'utente
+const ageIndex = 2;  // Ad esempio, 2 indica la terza fascia di età
+
 db.POIs.aggregate([
-{
-$match: {
-[`reviews_count_for_age.${ageIndex}`]: { $gt: 0 }
-}
-},
-{
-$group: {
-_id: "$city",
-maxReviewsCount: { $max: { $arrayElemAt: ["$reviews_count_for_age", ageIndex] } },
-poiName: { $first: "$name" },
-poiId: { $first: "$_id" }
-}
-},
+// Proiezione per estrarre la città e il valore `reviews_count_for_age` all'indice specificato
 {
 $project: {
-city: "$_id",
-poiName: 1,
-reviewsCountForAge: "$maxReviewsCount"
+name: 1,
+city: 1,
+reviews_count_for_age: { $arrayElemAt: ["$reviews_count_for_age", ageIndex] }
 }
-}
+},
+
+    // Raggruppamento per città, selezionando il POI con il massimo `reviews_count_for_age` per l'indice specificato
+    {
+        $sort: { "reviews_count_for_age": -1 }
+    },
+    {
+        $group: {
+            _id: "$city",
+            topPOI: { $first: "$name" },
+            maxReviewsForAge: { $first: "$reviews_count_for_age" }
+        }
+    },
+
+    // Ordinamento finale per rendere più leggibile
+    {
+        $sort: { "_id": 1 }
+    }
 ]);
