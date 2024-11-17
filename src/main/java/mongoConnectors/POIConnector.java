@@ -267,7 +267,7 @@ public class POIConnector {
         }
         return output;
     }
-    public static String bestPOIForAge(int ageSpan){
+    public static String bestPOIForAge(int ageSpan){ //data una fascia di età ti dice il miglior poi in ogni città
         int ageIndex = ageSpan; // Ad esempio, la terza fascia di età
 
         // Pipeline di aggregazione
@@ -301,6 +301,61 @@ public class POIConnector {
             output = output + doc.toJson() + "\n";
         }
         return output;
+    }
+    public static String bestPOIinCity(String city){ //data una città di dice il miglior poi per fascia di età
+        String cityName = city;
+
+        // Pipeline di aggregazione
+        List<Document> pipeline = Arrays.asList(
+                // Filtro per città
+                new Document("$match", new Document("city", cityName)),
+
+                // Proiezione per calcolare il rapporto stelle/recensioni per ciascuna fascia di età
+                new Document("$project", new Document()
+                        .append("name", 1)
+                        .append("city", 1)
+                        .append("ageGroupRatios", new Document("$map", new Document()
+                                .append("input", new Document("$range", Arrays.asList(0, new Document("$size", "$stars"))))
+                                .append("as", "index")
+                                .append("in", new Document("$cond", Arrays.asList(
+                                        new Document("$gt", Arrays.asList(
+                                                new Document("$arrayElemAt", Arrays.asList("$reviews_count_for_age", "$$index")), 0
+                                        )),
+                                        new Document("$divide", Arrays.asList(
+                                                new Document("$arrayElemAt", Arrays.asList("$stars", "$$index")),
+                                                new Document("$arrayElemAt", Arrays.asList("$reviews_count_for_age", "$$index"))
+                                        )),
+                                        0
+                                )))
+                        ))
+                ),
+
+                // Scomposizione dei POI in base alle fasce di età
+                new Document("$unwind", new Document("path", "$ageGroupRatios").append("includeArrayIndex", "ageIndex")),
+
+                // Ordinamento per trovare il rapporto massimo
+                new Document("$sort", new Document("ageGroupRatios", -1)),
+
+                // Raggruppamento per città e fascia di età
+                new Document("$group", new Document()
+                        .append("_id", new Document("city", "$city").append("ageIndex", "$ageIndex"))
+                        .append("topPOI", new Document("$first", "$name"))
+                        .append("maxRatio", new Document("$first", "$ageGroupRatios"))
+                ),
+
+                // Ordinamento finale per leggibilità
+                new Document("$sort", new Document("_id.city", 1).append("_id.ageIndex", 1))
+        );
+
+        // Esecuzione della query
+        AggregateIterable<Document> results = POIs.aggregate(pipeline);
+        String output = "";
+        // Iterazione sui risultati e stampa
+        for (Document doc : results) {
+            output = output + "\n" + doc.toJson();
+        }
+        return output;
+
     }
 
 }

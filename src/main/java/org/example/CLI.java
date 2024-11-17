@@ -192,7 +192,11 @@ public class CLI {
                             System.out.println(POIConnector.bestPOIForAge(ageSpan));
                             break;
                         case 3:
-                            System.out.println("todoo");
+                            data = insert(List.of("city"));
+                            System.out.println(POIConnector.bestPOIinCity(data.get(0)));
+                            break;
+                        case 4:
+                            System.out.println("mettere una analitica diversa, basata sulle città");
                             break;
                         default:
                             System.out.println("wrong input");
