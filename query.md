@@ -200,3 +200,95 @@ totalReviews: 1
 }
 }
 ])
+
+
+last query:
+
+db.POIs.aggregate([
+
+{
+$group: {
+_id: "$city",
+totalStars:{$sum : "$totStars"},
+totalReviews:{$sum : "$reviews_count"},
+values : {
+$push: "$stars"
+},
+reviews_agg:{
+$push:"$reviews_count_for_age"}
+}
+},
+{
+$project: {
+result1: {
+$reduce: {
+input: { $slice: [ "$values", 1, { $size: "$values" } ] },
+initialValue: { $arrayElemAt: [ "$values", 0 ] },
+in: {
+$map: {
+input: { $range: [ 0, { $size: "$$this" } ] },
+as: "index",
+in: {
+$add: [
+{ $arrayElemAt: [ "$$this", "$$index" ]  },
+{ $arrayElemAt: [ "$$value", "$$index" ]  }
+]
+}
+}
+}
+}
+},
+result2: {
+
+                $reduce: {
+                    input: { $slice: [ "$reviews_agg", 1, { $size: "$reviews_agg" } ] },
+                    initialValue: { $arrayElemAt: [ "$reviews_agg", 0 ] },
+                    in: {
+                        $map: {
+                            input: { $range: [ 0, { $size: "$$this" } ] },
+                            as: "index",
+                            in: {
+                                $add: [
+                                    { $arrayElemAt: [ "$$this", "$$index" ]  },
+                                    { $arrayElemAt: [ "$$value", "$$index" ]  }
+                                ]
+                            }
+                        }
+                    }
+                }}
+,
+totalStars : 1,
+totalReviews: 1
+}
+},
+{$project:{
+totalStars: 1,
+totalReviews: 1,
+ratio: {
+$cond: {
+if: { $eq: ["$totalReviews",0]},
+then : null,
+else:
+{$divide: ["$totalStars","$totalReviews"]}}
+},
+result1: 1,
+result2: 1,
+ratioAges: {
+$map: {
+input: {$range: [0, {$size : "$result1"}]},
+as: "index",
+in: {
+$cond : {
+if: { $eq: [{$arrayElemAt: ["$result2","$$index"]},0]},
+then: 0,
+else : {
+
+				$divide: [
+          {$arrayElemAt: ["$result1","$$index"]},
+          {$arrayElemAt: ["$result2","$$index"]}
+				]
+      }}
+		}
+	}
+}}}
+])

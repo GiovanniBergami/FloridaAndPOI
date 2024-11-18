@@ -357,5 +357,70 @@ public class POIConnector {
         return output;
 
     }
+    public static String citySummary(){
+        AggregateIterable<Document> result = POIs.aggregate(Arrays.asList(
+                // Fase $group
+                new Document("$group", new Document("_id", "$city")
+                        .append("totalStars", new Document("$sum", "$totStars"))
+                        .append("totalReviews", new Document("$sum", "$reviews_count"))
+                        .append("values", new Document("$push", "$stars"))
+                        .append("reviews_agg", new Document("$push", "$reviews_count_for_age"))
+                ),
+                // Fase $project con il calcolo di result1 e result2
+                new Document("$project", new Document("result1", new Document("$reduce", new Document("input",
+                        new Document("$slice", Arrays.asList("$values", 1, new Document("$size", "$values"))))
+                        .append("initialValue", new Document("$arrayElemAt", Arrays.asList("$values", 0)))
+                        .append("in", new Document("$map", new Document("input", new Document("$range", Arrays.asList(0, new Document("$size", "$$this"))))
+                                .append("as", "index")
+                                .append("in", new Document("$add", Arrays.asList(
+                                        new Document("$arrayElemAt", Arrays.asList("$$this", "$$index")),
+                                        new Document("$arrayElemAt", Arrays.asList("$$value", "$$index"))
+                                )))
+                        ))
+                )
+                ).append("result2", new Document("$reduce", new Document("input",
+                                        new Document("$slice", Arrays.asList("$reviews_agg", 1, new Document("$size", "$reviews_agg"))))
+                                        .append("initialValue", new Document("$arrayElemAt", Arrays.asList("$reviews_agg", 0)))
+                                        .append("in", new Document("$map", new Document("input", new Document("$range", Arrays.asList(0, new Document("$size", "$$this"))))
+                                                .append("as", "index")
+                                                .append("in", new Document("$add", Arrays.asList(
+                                                        new Document("$arrayElemAt", Arrays.asList("$$this", "$$index")),
+                                                        new Document("$arrayElemAt", Arrays.asList("$$value", "$$index"))
+                                                )))
+                                        ))
+                                )
+                        ).append("totalStars", 1)
+                        .append("totalReviews", 1)
+                ),
+                // Secondo $project per calcolare il rapporto e ratioAges
+                new Document("$project", new Document("totalStars", 1)
+                        .append("totalReviews", 1)
+                        .append("ratio", new Document("$cond", new Document("if", new Document("$eq", Arrays.asList("$totalReviews", 0)))
+                                .append("then", null)
+                                .append("else", new Document("$divide", Arrays.asList("$totalStars", "$totalReviews")))
+                        ))
+                        .append("result1", 1)
+                        .append("result2", 1)
+                        .append("ratioAges", new Document("$map", new Document("input", new Document("$range", Arrays.asList(0, new Document("$size", "$result1"))))
+                                .append("as", "index")
+                                .append("in", new Document("$cond", new Document("if", new Document("$eq", Arrays.asList(new Document("$arrayElemAt", Arrays.asList("$result2", "$$index")), 0)))
+                                        .append("then", 0)
+                                        .append("else", new Document("$divide", Arrays.asList(
+                                                new Document("$arrayElemAt", Arrays.asList("$result1", "$$index")),
+                                                new Document("$arrayElemAt", Arrays.asList("$result2", "$$index"))
+                                        )))
+                                ))
+                        ))
+                )
+        ));
+        String output = "";
+        for(Document d: result){
+            output = output + "\n" + d.toJson();
+        }
+    return output;
+
+
+    }
+
 
 }

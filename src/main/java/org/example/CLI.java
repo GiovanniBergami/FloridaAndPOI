@@ -180,7 +180,7 @@ public class CLI {
                     break;
                 case 5:
                     System.out.println("Analytics");
-                    switch(chooseBetween(List.of("citiStatistics","query2","query3"),"")){
+                    switch(chooseBetween(List.of("citiStatistics","query2","query3","citySummary"),"")){
                         case 1:
                             data = insert(List.of("city"));
                             System.out.println(POIConnector.poiOfCityStatistics(data.get(0)));
@@ -196,7 +196,7 @@ public class CLI {
                             System.out.println(POIConnector.bestPOIinCity(data.get(0)));
                             break;
                         case 4:
-                            System.out.println("mettere una analitica diversa, basata sulle città");
+                            System.out.println(POIConnector.citySummary());
                             break;
                         default:
                             System.out.println("wrong input");
