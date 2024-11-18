@@ -109,6 +109,18 @@ public class POIConnector {
         POIs.updateOne(filter,updateOperation);
         return true;
     }
+    public static boolean incrementFieldPOI(ObjectId poi_id,String field,int value){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
+        Document filter = new Document("_id",poi_id);
+        Document updateOperation = new Document("$inc",new Document(field,value));
+        POIs.updateOne(filter,updateOperation);
+        return true;
+    }
+    public static boolean incrementArrayFieldPOI(ObjectId poi_id,String field,int value,String index){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
+        Document filter = new Document("_id",poi_id);
+        Document updateOperation = new Document("$inc",new Document(field+"."+index,value));
+        POIs.updateOne(filter,updateOperation);
+        return true;
+    }
 
     public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
         Document filter = new Document("_id",poi_id);
