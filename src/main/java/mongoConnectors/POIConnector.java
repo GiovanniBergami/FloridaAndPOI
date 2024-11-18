@@ -123,8 +123,17 @@ public class POIConnector {
     }
 
     public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
+        Document review = ReviewConnector.getReview(review_id);
+        String ageSpan = ageSpan(review.getString("username"));
+        int stars = review.getInteger("stars").intValue();
         Document filter = new Document("_id",poi_id);
-        Document updateOperation = new Document("$push",new Document("review_ids",review_id));
+        Document updateOperation = new Document()
+                .append("$push",new Document("review_ids",review_id))
+                .append("$inc",new Document()
+                    .append("reviews_count",1)
+                    .append("totStars",stars)
+                    .append("reviews_count_for_age"+"."+ageSpan,1)
+                    .append("stars"+"."+ageSpan,stars));
         POIs.updateOne(filter,updateOperation);
         return true;
     }
@@ -141,8 +150,17 @@ public class POIConnector {
     }
 
     public static boolean removeReviewFromPOI(ObjectId poi_id, ObjectId review_id){
+        Document review = ReviewConnector.getReview(review_id);
+        String ageSpan = ageSpan(review.getString("username"));
+        int stars = review.getInteger("stars").intValue();
         Document filter = new Document("_id",poi_id);
-        Document updateOperation = new Document("$pull",new Document("review_ids",review_id));
+        Document updateOperation = new Document()
+                .append("$pull",new Document("review_ids",review_id))
+                .append("$inc",new Document()
+                    .append("reviews_count",-1)
+                    .append("totStars",stars * -1)
+                    .append("reviews_count_for_age"+"."+ageSpan,-1)
+                    .append("stars"+"."+ageSpan,stars * -1));
         POIs.updateOne(filter,updateOperation);
         return true;
     }
@@ -432,6 +450,19 @@ public class POIConnector {
     return output;
 
 
+    }
+    public static String ageSpan(String username){
+
+        int age = UserConnector.findUser(username).getInteger("age").intValue();
+        if(age<=15)
+            return "0";
+        if(age<=30)
+            return "1";
+        if(age<=50)
+            return "2";
+        if(age<=70)
+            return "3";
+        return "4";
     }
 
 

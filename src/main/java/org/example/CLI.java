@@ -275,6 +275,8 @@ public class CLI {
         String userName = scanner.nextLine();
         System.out.println("insert date");
         String date = scanner.nextLine();
+
+
         if(ReviewConnector.remove(review_id,"")){
             POIConnector.removeReviewFromPOI(poi_id,review_id);
             neoConnector.removeVisit(poi_id.toString(),userName,date);
@@ -359,14 +361,10 @@ public class CLI {
                             data = insert(List.of("Insert the _id of the review you want to remove","date"));
 //                            String id_exa = scanner.nextLine();
                             ObjectId review_id = new ObjectId(data.get(0));
-                            Document review = ReviewConnector.getReview(review_id);
+                            POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
                             if(ReviewConnector.remove(review_id,sessionUser.getString("name"))){
                                 System.out.println("Deleted");
-                                POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
-                                POIConnector.incrementFieldPOI(poi.getObjectId("_id"),"reviews_count",-1);
-                                POIConnector.incrementFieldPOI(poi.getObjectId("_id"),"totStars",review.getInteger("stars")*-1);
-                                POIConnector.incrementArrayFieldPOI(poi.getObjectId("_id"),"reviews_count_for_age",-1,ageSpan());
-                                POIConnector.incrementArrayFieldPOI(poi.getObjectId("_id"),"stars",review.getInteger("stars")*-1,ageSpan());
+
                                 neoConnector.removeVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),data.get(1));
                             }else{
                                 System.out.println("Not deleted, maybe not found");
@@ -589,10 +587,6 @@ public class CLI {
         String text = scanner.nextLine();
         ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
         POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
-        POIConnector.incrementFieldPOI(poi.getObjectId("_id"),"reviews_count",1);
-        POIConnector.incrementFieldPOI(poi.getObjectId("_id"),"totStars",stars);
-        POIConnector.incrementArrayFieldPOI(poi.getObjectId("_id"),"stars",stars,ageSpan());
-        POIConnector.incrementArrayFieldPOI(poi.getObjectId("_id"),"reviews_count_for_age",1,ageSpan());
         neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date);
         return true;
     }
@@ -699,6 +693,19 @@ public class CLI {
 
     public static String ageSpan(){
         int age = sessionUser.getInteger("age").intValue();
+        if(age<=15)
+            return "0";
+        if(age<=30)
+            return "1";
+        if(age<=50)
+            return "2";
+        if(age<=70)
+            return "3";
+        return "4";
+    }
+    public static String ageSpan(String username){
+
+        int age = UserConnector.findUser(username).getInteger("age").intValue();
         if(age<=15)
             return "0";
         if(age<=30)
