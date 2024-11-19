@@ -290,12 +290,15 @@ public class POIConnector {
 
         // Esecuzione della query di aggregazione
         AggregateIterable<Document> results = POIs.aggregate(pipeline);
+
         String output = "";
         // Iterazione e stampa dei risultati
         for (Document doc : results) {
             output = output + doc.toJson() + "\n";
         }
         return output;
+//        Document result = POIs.aggregate(pipeline).explain();
+//        return result.toJson();
     }
     public static String bestPOIForAge(int ageSpan){ //data una fascia di età ti dice il miglior poi in ogni città
         int ageIndex = ageSpan; // Ad esempio, la terza fascia di età
@@ -331,6 +334,9 @@ public class POIConnector {
             output = output + doc.toJson() + "\n";
         }
         return output;
+
+//        Document result = POIs.aggregate(pipeline).explain();
+//        return result.toJson();
     }
     public static String bestPOIinCity(String city){ //data una città di dice il miglior poi per fascia di età
         String cityName = city;
@@ -386,9 +392,12 @@ public class POIConnector {
         }
         return output;
 
+//        Document result = POIs.aggregate(pipeline).explain();
+//        return result.toJson();
+
     }
-    public static String citySummary(){
-        AggregateIterable<Document> result = POIs.aggregate(Arrays.asList(
+    public static String citySummary(){ //restituisce statistiche aggregate su ogni città
+        List<Document> pipeline = (Arrays.asList(
                 // Fase $group
                 new Document("$group", new Document("_id", "$city")
                         .append("totalStars", new Document("$sum", "$totStars"))
@@ -443,13 +452,15 @@ public class POIConnector {
                         ))
                 )
         ));
+        AggregateIterable<Document> result = POIs.aggregate(pipeline);
         String output = "";
         for(Document d: result){
             output = output + "\n" + d.toJson();
         }
-    return output;
+        return output;
 
-
+//        Document result = POIs.aggregate(pipeline).explain();
+//        return result.toJson();
     }
     public static String ageSpan(String username){
 

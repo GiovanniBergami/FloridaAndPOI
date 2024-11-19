@@ -180,7 +180,7 @@ public class CLI {
                     break;
                 case 5:
                     System.out.println("Analytics");
-                    switch(chooseBetween(List.of("citiStatistics","query2","query3","citySummary"),"")){
+                    switch(chooseBetween(List.of("Stat of POIs of a given city","best poi given age","best pois given city","citySummary"),"")){
                         case 1:
                             data = insert(List.of("city"));
                             System.out.println(POIConnector.poiOfCityStatistics(data.get(0)));
