@@ -497,7 +497,7 @@ public class CLI {
         boolean exit = false;
         while(!exit){
             System.out.println("Hi Unsigned User, which action do you want to take?");
-            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","TestNeo - sperimental","Stop"),"unsignedUser> ");
+            int action = chooseBetween(List.of("Log in","Register","Search POI","Log in as Admin","Stop"),"unsignedUser> ");
             switch(action){
                 case 1:
                     if(logIn(false)){
@@ -525,9 +525,6 @@ public class CLI {
                     }
                     break;
                 case 5:
-                    neoSperimental();
-                    break;
-                case 6:
                     Main.exit();
                     break;
                 default:
