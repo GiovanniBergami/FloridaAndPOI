@@ -275,15 +275,24 @@ public class CLI {
         String userName = scanner.nextLine();
         System.out.println("insert date");
         String date = scanner.nextLine();
-
+        Document review = ReviewConnector.getReview(review_id);
 
         if(ReviewConnector.remove(review_id,"")){
-            POIConnector.removeReviewFromPOI(poi_id,review_id);
-            neoConnector.removeVisit(poi_id.toString(),userName,date);
-            System.out.println("Deleted");
+            if(POIConnector.removeReviewFromPOI(poi_id,review_id)){
+                if(neoConnector.removeVisit(poi_id.toString(),userName,date)){
+                    System.out.println("Deleted");
+                }else{
+                    ObjectId newId = ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
+                    POIConnector.addReviewToPOI(poi_id,newId);
+                    System.out.println("not deleted");
+                }
+            }else{
+                ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
+                System.out.println("not deleted");
+            }
         }else{
-            System.out.println("Not deleted, maybe not found");
-        };
+            System.out.println("Not deleted");
+        }
     }
     public static void removeUser(){
         System.out.println("Insert the name of the user you want to remove");
@@ -370,14 +379,25 @@ public class CLI {
                             data = insert(List.of("Insert the _id of the review you want to remove","date"));
 //                            String id_exa = scanner.nextLine();
                             ObjectId review_id = new ObjectId(data.get(0));
-                            POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
-                            if(ReviewConnector.remove(review_id,sessionUser.getString("name"))){
-                                System.out.println("Deleted");
 
-                                neoConnector.removeVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),data.get(1));
+                            Document review = ReviewConnector.getReview(review_id);
+
+                            if(POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id)) {
+                                if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
+                                    if(neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))){
+                                        System.out.println("deleted");
+                                    }else{
+                                        ObjectId newId = ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
+                                        POIConnector.addReviewToPOI(poi.getObjectId("_id"),newId);
+                                        System.out.println("Not deleted");
+                                    }
+                                } else {
+                                    POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
+                                    System.out.println("Not deleted");
+                                }
                             }else{
-                                System.out.println("Not deleted, maybe not found");
-                            };
+                                System.out.println("not deleted");
+                            }
                             break;
                         case 4:
                             System.out.println("plan to visit");
@@ -592,9 +612,22 @@ public class CLI {
         System.out.println("text");
         String text = scanner.nextLine();
         ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
-        POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
-        neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date);
-        return true;
+        if(review_id != null) {
+            if(POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id)){
+                if(neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date)){
+                    System.out.println("added");
+                    return true;
+                }else{
+                    POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id);
+                    ReviewConnector.remove(review_id,"");
+                }
+            }else{
+                ReviewConnector.remove(review_id,"");
+            }
+        }
+
+        System.out.println("not added");
+        return false;
     }
 
 

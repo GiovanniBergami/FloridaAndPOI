@@ -79,29 +79,44 @@ public class ReviewConnector {
                         .append("date",date)
                         .append("text",text)
                         .append("stars",rating);
-        reviews.insertOne(doc);
-
-        return doc.getObjectId("_id");
+        try {
+            reviews.insertOne(doc);
+            return doc.getObjectId("_id");
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     //DELETE
     public static boolean remove(ObjectId id,String name){
         if(name.equals("")){
             Document filter = new Document("_id",id);
-            DeleteResult result = reviews.deleteOne(filter);
-            if(result.getDeletedCount()>0){
-                return true;
-            }else{
+            try {
+                DeleteResult result = reviews.deleteOne(filter);
+                if(result.getDeletedCount()>0){
+                    return true;
+                }else{
+                    return false;
+                }
+            }catch(Exception e){
+                System.out.println(e.getMessage());
                 return false;
             }
+
         }else{
 
             Document filter = new Document("_id",id)
                     .append("username",name);
-            DeleteResult result = reviews.deleteOne(filter);
-            if(result.getDeletedCount()>0){
-                return true;
-            }else{
+            try {
+                DeleteResult result = reviews.deleteOne(filter);
+                if (result.getDeletedCount() > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }catch(Exception e){
+                System.out.println(e.getMessage());
                 return false;
             }
         }

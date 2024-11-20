@@ -288,7 +288,7 @@ public class neoConnector {
         }
     }
 
-    public static void addVisit(String poiId, String name, Double stars, String date) {
+    public static boolean addVisit(String poiId, String name, Double stars, String date) {
         try(Session session = driver.session()) {
             // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
             String query = """
@@ -310,6 +310,10 @@ public class neoConnector {
 //                        user1.get("name").asString() + " e " +
 //                        user2.get("name").asString());
 //            }
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
         }
     }
     public static void addPlan(String poiId, String name,  String date) {
@@ -360,7 +364,7 @@ public class neoConnector {
         }
     }
 
-    public static void removeVisit(String poiId, String name,  String date) {
+    public static boolean removeVisit(String poiId, String name,  String date) {
         try(Session session = driver.session()) {
             // Esegui la query per creare una relazione di visita. ci sarà da vedere se le stelle servono in entrambi i versi, in caso si fa in fretta a toglierle
             String query = """
@@ -381,6 +385,10 @@ public class neoConnector {
 //                        user1.get("name").asString() + " e " +
 //                        user2.get("name").asString());
 //            }
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
         }
     }
     public static List<String> getPlans(String userName){

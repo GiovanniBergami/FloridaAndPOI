@@ -134,8 +134,13 @@ public class POIConnector {
                     .append("totStars",stars)
                     .append("reviews_count_for_age"+"."+ageSpan,1)
                     .append("stars"+"."+ageSpan,stars));
-        POIs.updateOne(filter,updateOperation);
-        return true;
+        try {
+            POIs.updateOne(filter, updateOperation);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
     //DELETE
     public static boolean remove(ObjectId id){
@@ -161,8 +166,13 @@ public class POIConnector {
                     .append("totStars",stars * -1)
                     .append("reviews_count_for_age"+"."+ageSpan,-1)
                     .append("stars"+"."+ageSpan,stars * -1));
-        POIs.updateOne(filter,updateOperation);
-        return true;
+        try {
+            POIs.updateOne(filter, updateOperation);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     //ALTRE FUNZIONI
