@@ -263,17 +263,45 @@ public class CLI {
         }
 
         ObjectId id = poi.getObjectId("_id");
+        List<Document> reviews = new ArrayList<>();
+        List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
+        for(ObjectId review_id : review_ids ){
+            reviews.add(ReviewConnector.getReview(review_id));
+        }
 
         if(POIConnector.remove(id)){
-            System.out.println("Deleted");
-            List<ObjectId> review_ids = poi.getList("review_ids",ObjectId.class);
-            if(review_ids!=null){
-                for(ObjectId review_id : review_ids){
-                    ReviewConnector.remove(review_id,"");
+            if(CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"))) {
+
+                if (review_ids != null) {
+                    if(ReviewConnector.removeMany(review_ids)){
+                        if(neoConnector.deletePOI(id.toString())){
+                            System.out.println("deleted");
+                        }else{
+                            for(Document r: reviews)
+                                ReviewConnector.insertReview(r.toJson());
+                            CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
+                            POIConnector.insertPOI(poi.toJson());
+                            System.out.println("not deleted");
+                        }
+                    }else{
+                        CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
+                        POIConnector.insertPOI(poi.toJson());
+                        System.out.println("not deleted");
+                    }
+                }else{
+                    if(neoConnector.deletePOI(id.toString())){
+                        System.out.println("deleted");
+                    }else{
+                        CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
+                        POIConnector.insertPOI(poi.toJson());
+                        System.out.println("not deleted");
+                    }
+
                 }
+            }else{
+                POIConnector.insertPOI(poi.toJson()); //controllare se _id resta uguale, in caso migliorare le reviews
+                System.out.println("not deleted");
             }
-            CityConnector.removePOIFromCity(poi.getString("city"),poi.getObjectId("_id"));
-            neoConnector.deletePOI(id.toString());
         }else{
             System.out.println("Not deleted");
         };

@@ -44,11 +44,15 @@ public class POIConnector {
             return null;
         }
     }
-    public static int insertPOI(String jsonPOI){
+    public static boolean insertPOI(String jsonPOI){
         Document doc = Document.parse(jsonPOI);
-        POIs.insertOne(doc);
-        System.out.println("inserimento avvenuto: ");
-        return 0;
+        try {
+            POIs.insertOne(doc);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
     public static int insertPOIs(String jsonPath){
 

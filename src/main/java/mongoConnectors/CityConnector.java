@@ -108,6 +108,18 @@ public class CityConnector {
             return false;
         }
     }
+
+    public static boolean addPOIToCityName(String city_name, ObjectId poi_id){ //sperimental
+        Document filter = new Document("name",city_name);
+        Document updateOperation = new Document("$push",new Document("POI_ids",poi_id));
+        try {
+            cities.updateOne(filter, updateOperation);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
     //DELETE
     public static boolean remove(ObjectId id){
         Document filter = new Document("_id",id);

@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -122,6 +123,34 @@ public class ReviewConnector {
         }
 
 
+    }
+    public static boolean removeMany(List<ObjectId> ids){
+
+        Document filter = new Document("_id",new Document("$in",ids));
+        try {
+            DeleteResult result = reviews.deleteMany(filter);
+            if(result.getDeletedCount()==ids.size()){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+
+
+    }
+    public static boolean insertReview(String jsonReview){
+        Document doc = Document.parse(jsonReview);
+        try {
+            reviews.insertOne(doc);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
 
