@@ -36,9 +36,13 @@ public class POIConnector {
                 .append("reviews_ids",new ArrayList<>())
                 .append("reviews_count",0)
                 .append("visit_count",0);
-        POIs.insertOne(doc);
-
-        return doc.getObjectId("_id");
+        try {
+            POIs.insertOne(doc);
+            return doc.getObjectId("_id");
+        }catch(Exception e){
+            e.getMessage();
+            return null;
+        }
     }
     public static int insertPOI(String jsonPOI){
         Document doc = Document.parse(jsonPOI);
@@ -145,10 +149,15 @@ public class POIConnector {
     //DELETE
     public static boolean remove(ObjectId id){
         Document filter = new Document("_id",id);
-        DeleteResult result = POIs.deleteOne(filter);
-        if(result.getDeletedCount()>0){
-            return true;
-        }else{
+        try {
+            DeleteResult result = POIs.deleteOne(filter);
+            if (result.getDeletedCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
             return false;
         }
 

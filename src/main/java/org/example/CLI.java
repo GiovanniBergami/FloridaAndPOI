@@ -233,9 +233,22 @@ public class CLI {
                 System.out.println("Insert address");
                 String address = scanner.nextLine();
                 ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
-                CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"),newPOIId);
-                neoConnector.addPOI(name,newPOIId.toString());
-                System.out.println("The POI has been added");
+                if(newPOIId != null) {
+                    if(CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"), newPOIId)){
+                        if(neoConnector.addPOI(name, newPOIId.toString())){
+                            System.out.println("The POI has been added");
+                        }else{
+                            CityConnector.removePOIFromCity(cityOfPOI.getString("name"),newPOIId);
+                            POIConnector.remove(newPOIId);
+                            System.out.println("no poi added");
+                        }
+                    }else{
+                        POIConnector.remove(newPOIId);
+                        System.out.println("no poi added");
+                    }
+                }else{
+                    System.out.println("no poi added");
+                }
             }
         }
     }

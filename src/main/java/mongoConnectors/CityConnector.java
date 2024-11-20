@@ -100,8 +100,13 @@ public class CityConnector {
     public static boolean addPOIToCity(ObjectId city_id, ObjectId poi_id){
         Document filter = new Document("_id",city_id);
         Document updateOperation = new Document("$push",new Document("POI_ids",poi_id));
-        cities.updateOne(filter,updateOperation);
-        return true;
+        try {
+            cities.updateOne(filter, updateOperation);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
     //DELETE
     public static boolean remove(ObjectId id){
@@ -118,8 +123,13 @@ public class CityConnector {
     public static boolean removePOIFromCity(String city_name, ObjectId poi_id){
         Document filter = new Document("name",city_name);
         Document updateOperation = new Document("$pull",new Document("POI_ids",poi_id));
-        cities.updateOne(filter,updateOperation);
-        return true;
+        try {
+            cities.updateOne(filter, updateOperation);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     //ALTRE FUNZIONI

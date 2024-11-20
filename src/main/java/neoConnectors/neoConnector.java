@@ -90,7 +90,7 @@ public class neoConnector {
         return true;
     }
 
-    public static void addPOI(String name,String mongoId){
+    public static boolean addPOI(String name,String mongoId){
         try(Session session = driver.session()){
             String query = "CREATE (u:POI {name: $name,mongoId: $mongoId}) RETURN u";
             Result result = session.run(query,
@@ -100,6 +100,10 @@ public class neoConnector {
 //            var createdUser = result.single().get(0).asNode();
 //            System.out.println("Utente creato: " + createdUser.get("name").asString() +
 //                    ", mongoId: "+ createdUser.get("mongoId"));
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
         }
     }
     public static void addFriendshipRequest(String requester, String objective){
@@ -422,7 +426,7 @@ public class neoConnector {
             Result result = session.run(query);
         }
     }
-    public static void deletePOI(String mongoIdToRemove){
+    public static boolean deletePOI(String mongoIdToRemove){
         try(Session session = driver.session()){
             String query = """
                 MATCH (u:POI {mongoId: $mongoId})
@@ -436,9 +440,14 @@ public class neoConnector {
             // Controlla se l'utente è stato effettivamente rimosso
             if (result.hasNext()) {
                 System.out.println("poi rimosso da neo: " + mongoIdToRemove);
+                return true;
             } else {
                 System.out.println("Nessun poi trovato con il nome: " + mongoIdToRemove);
+                return false;
             }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
         }
     }
 
