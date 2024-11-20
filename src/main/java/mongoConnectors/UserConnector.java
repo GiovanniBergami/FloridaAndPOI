@@ -41,13 +41,20 @@ public class UserConnector {
     }
 
     public static ObjectId createUser(String username,String password,int age){
+
         Document doc;
 
         doc =  new Document("name",username)
                 .append("password",password)
                 .append("age",age);
-        users.insertOne(doc);
-        return doc.getObjectId("_id");
+        try {
+            users.insertOne(doc);
+            return doc.getObjectId("_id");
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+
     }
 
     //READ

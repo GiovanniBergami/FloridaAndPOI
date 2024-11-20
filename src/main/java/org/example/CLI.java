@@ -628,7 +628,16 @@ public class CLI {
         ObjectId mongoId;
         if(UserConnector.findUser(username).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
             mongoId = UserConnector.createUser(username,password,age);
-            neoConnector.addUser(username,mongoId.toString());
+            if(mongoId != null) {
+                if (neoConnector.addUser(username, mongoId.toString())) {
+                    System.out.println("user added");
+                } else {
+                    System.out.println("user not added");
+                    UserConnector.remove(mongoId);
+                }
+            }else{
+                System.out.println("user not added");
+            }
         }else{
             System.out.println("The username is already taken");
         }

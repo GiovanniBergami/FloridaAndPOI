@@ -73,7 +73,7 @@ public class neoConnector {
         }
     }
 
-    public static void addUser(String name,String mongoId){
+    public static boolean addUser(String name,String mongoId){
         try(Session session = driver.session()){
             String query = "CREATE (u:User {name: $name,mongoId: $mongoId}) RETURN u";
             Result result = session.run(query,
@@ -85,7 +85,9 @@ public class neoConnector {
 //                    ", mongoId: "+ createdUser.get("mongoId"));
         }catch(Exception e){
             System.out.println(e.getMessage());
+            return false;
         }
+        return true;
     }
 
     public static void addPOI(String name,String mongoId){
