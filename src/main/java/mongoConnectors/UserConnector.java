@@ -138,13 +138,17 @@ public class UserConnector {
     //DELETE
     public static boolean remove(ObjectId id){
         Document filter = new Document("_id",id);
-        DeleteResult result = users.deleteOne(filter);
-        if(result.getDeletedCount()>0){
-            return true;
-        }else{
+        try {
+            DeleteResult result = users.deleteOne(filter);
+            if(result.getDeletedCount()>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
             return false;
         }
-
     }
     public static boolean updateFieldUser(ObjectId user_id,String field,String value){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
         Document filter = new Document("_id",user_id);

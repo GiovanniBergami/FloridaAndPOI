@@ -291,8 +291,17 @@ public class CLI {
         if(user.getString("name").equals("0")){
             System.out.println("User not found");
         }else{
-            UserConnector.remove(user.getObjectId("_id"));
-            neoConnector.deleteUser(user.getString("name"));
+            if(UserConnector.remove(user.getObjectId("_id"))){
+                if(neoConnector.deleteUser(user.getString("name"))){
+                    System.out.println("user has been deleted");
+                }else{
+                    UserConnector.createUser(user.getString("name"),user.getString("password"),user.getInteger("age").intValue());
+                    System.out.println("user hasn't been deleted");
+                }
+            }else{
+                System.out.println("user hasn't been deleted");
+            }
+
         }
 
     }
@@ -634,10 +643,15 @@ public class CLI {
         switch(c){
             case 1:
                 if(UserConnector.remove(sessionUser.getObjectId("_id"))){
-                    neoConnector.deleteUser(sessionUser.getString("name"));
-                    sessionUser = null;
-                    System.out.println("User has been deleted");
-                    unsignedUser();
+                    if(neoConnector.deleteUser(sessionUser.getString("name"))){
+                        sessionUser = null;
+                        System.out.println("User has been deleted");
+                        unsignedUser();
+                    }else{
+                        UserConnector.createUser(sessionUser.getString("name"),sessionUser.getString("password"),sessionUser.getInteger("age").intValue());
+                        System.out.println("User hasn't been deleted due to some problems");
+                    }
+
                 }else{
                     System.out.println("User hasn't been deleted due to some problems");
                 }

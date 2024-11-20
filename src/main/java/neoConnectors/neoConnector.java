@@ -201,7 +201,7 @@ public class neoConnector {
         }
     }
 
-    public static void deleteUser(String userNameToRemove){
+    public static boolean deleteUser(String userNameToRemove){
         try(Session session = driver.session()){
             String query = """
                 MATCH (u:User {name: $userName})
@@ -215,9 +215,14 @@ public class neoConnector {
             // Controlla se l'utente è stato effettivamente rimosso
             if (result.hasNext()) {
                 System.out.println("Utente rimosso: " + userNameToRemove);
+                return true;
             } else {
                 System.out.println("Nessun utente trovato con il nome: " + userNameToRemove);
+                return false;
             }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
         }
     }
     public static void getRequested(String userName){
