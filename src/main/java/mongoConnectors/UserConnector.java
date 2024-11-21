@@ -56,6 +56,16 @@ public class UserConnector {
         }
 
     }
+    public static boolean createUser(String jsonUser){
+        Document doc = Document.parse(jsonUser);
+        try {
+            users.insertOne(doc);
+            return true;
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
     //READ
 

@@ -345,7 +345,7 @@ public class CLI {
                 if(neoConnector.deleteUser(user.getString("name"))){
                     System.out.println("user has been deleted");
                 }else{
-                    UserConnector.createUser(user.getString("name"),user.getString("password"),user.getInteger("age").intValue());
+                    UserConnector.createUser(user.toJson());
                     System.out.println("user hasn't been deleted");
                 }
             }else{
@@ -428,8 +428,8 @@ public class CLI {
                                     if(neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))){
                                         System.out.println("deleted");
                                     }else{
-                                        ObjectId newId = ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
-                                        POIConnector.addReviewToPOI(poi.getObjectId("_id"),newId);
+                                        ReviewConnector.insertReview(review.toJson());
+                                        POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
                                         System.out.println("Not deleted");
                                     }
                                 } else {
@@ -645,13 +645,16 @@ public class CLI {
         System.out.println("Insert Review data:");
         System.out.println("insert your name");
         String name = scanner.nextLine();
-        System.out.println("Stars");
-        int stars = scanner.nextInt();
-        scanner.nextLine();
+
         System.out.println("date");
         String date = scanner.nextLine();
         System.out.println("text");
         String text = scanner.nextLine();
+
+        System.out.println("Stars");
+        int stars = scanner.nextInt();
+        scanner.nextLine();
+
         ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
         if(review_id != null) {
             if(POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id)){
@@ -731,7 +734,7 @@ public class CLI {
                         System.out.println("User has been deleted");
                         unsignedUser();
                     }else{
-                        UserConnector.createUser(sessionUser.getString("name"),sessionUser.getString("password"),sessionUser.getInteger("age").intValue());
+                        UserConnector.createUser(sessionUser.toJson());
                         System.out.println("User hasn't been deleted due to some problems");
                     }
 
