@@ -30,12 +30,18 @@ public class POIConnector {
     public static org.bson.types.ObjectId insertPOI(String name, String address, String city){
 
         Document doc;
+        ArrayList<Integer> starsList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            starsList.add(0);
+        }
         doc =  new Document("name",name)
                 .append("address",address)
                 .append("city",city)
-                .append("reviews_ids",new ArrayList<>())
+                .append("review_ids",new ArrayList<>())
                 .append("reviews_count",0)
-                .append("visit_count",0);
+                .append("stars",starsList)
+                .append("reviews_count_for_age",starsList)
+                .append("totStars",0);
         try {
             POIs.insertOne(doc);
             return doc.getObjectId("_id");
