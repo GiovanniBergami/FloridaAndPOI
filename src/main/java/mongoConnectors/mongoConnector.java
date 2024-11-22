@@ -11,7 +11,7 @@ public class mongoConnector {
 //    static public MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 //    static public MongoDatabase database =  mongoClient.getDatabase("LargeScaleProject");
 
-    static ConnectionString uri = new ConnectionString("mongodb://localhost:27018");
+    static ConnectionString uri = new ConnectionString("mongodb://localhost:27018,localhost:27019,localhost27020/");
     static MongoClientSettings mcs = MongoClientSettings.builder()
             .applyConnectionString(uri)
             .readPreference(ReadPreference.nearest())

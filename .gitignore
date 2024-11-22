@@ -66,3 +66,7 @@ dataset/prepared/first stable version/users.json
 /dataset/prepared/v2/pois.json
 /dataset/prepared/v2/reviews.json
 /dataset/prepared/v2/users.json
+/dataset/prepared/migrate/cities.json
+/dataset/prepared/migrate/POIs.json
+/dataset/prepared/migrate/reviews.json
+/dataset/prepared/migrate/users.json
