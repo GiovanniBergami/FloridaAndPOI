@@ -329,7 +329,7 @@ public class POIConnector {
 //        Document result = POIs.aggregate(pipeline).explain();
 //        return result.toJson();
     }
-    public static String bestPOIForAge(int ageSpan){ //data una fascia di età ti dice il miglior poi in ogni città
+    public static String bestPOIForAge(int ageSpan){ //data una fascia di età ti dice il miglior poi in ogni città TODO mettere età e poi converte lui in agespan
         int ageIndex = ageSpan; // Ad esempio, la terza fascia di età
 
         // Pipeline di aggregazione

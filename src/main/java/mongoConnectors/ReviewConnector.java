@@ -142,7 +142,7 @@ public class ReviewConnector {
 
 
     }
-    public static boolean insertReview(String jsonReview){
+    public static boolean insertReview(String jsonReview){  //rename insert in create and get in find TODO rename stuff
         Document doc = Document.parse(jsonReview);
         try {
             reviews.insertOne(doc);
