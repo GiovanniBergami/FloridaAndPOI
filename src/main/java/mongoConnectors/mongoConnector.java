@@ -16,7 +16,7 @@ public class mongoConnector {
             .applyConnectionString(uri)
             .readPreference(ReadPreference.nearest())
             .retryWrites(true)
-            .writeConcern(WriteConcern.ACKNOWLEDGED).build();
+            .writeConcern(WriteConcern.W1).build();
     static public MongoClient mongoClient = MongoClients.create(mcs);
 
     //sopra nuovo modo
