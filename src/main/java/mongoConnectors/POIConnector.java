@@ -6,13 +6,9 @@ import neoConnectors.neoConnector;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-
 
 
 import static com.mongodb.client.model.Filters.and;
@@ -27,7 +23,7 @@ public class POIConnector {
 
     //CREATE
 
-    public static org.bson.types.ObjectId insertPOI(String name, String address, String city){
+    public static org.bson.types.ObjectId createPOI(String name, String address, String city){
 
         Document doc;
         ArrayList<Integer> starsList = new ArrayList<>();
@@ -50,7 +46,7 @@ public class POIConnector {
             return null;
         }
     }
-    public static boolean insertPOI(String jsonPOI){
+    public static boolean createPOI(String jsonPOI){
         Document doc = Document.parse(jsonPOI);
         try {
             POIs.insertOne(doc);
@@ -60,7 +56,7 @@ public class POIConnector {
             return false;
         }
     }
-    public static int insertPOIs(String jsonPath){
+    public static int createPOIsFromJsonFile(String jsonPath){
 
 //        String line;
 //        Document doc;

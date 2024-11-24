@@ -68,7 +68,7 @@ public class CLI {
                             break;
                         case 5:
                             System.out.println("Insert POIs, specify path");
-                            POIConnector.insertPOIs(scanner.nextLine());
+                            POIConnector.createPOIsFromJsonFile(scanner.nextLine());
                             POIConnector.count();
                             break;
                         case 6:
@@ -229,7 +229,7 @@ public class CLI {
             }else{
                 System.out.println("Insert address");
                 String address = scanner.nextLine();
-                ObjectId newPOIId =POIConnector.insertPOI(name,address,city);
+                ObjectId newPOIId =POIConnector.createPOI(name,address,city);
                 if(newPOIId != null) {
                     if(CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"), newPOIId)){
                         if(neoConnector.addPOI(name, newPOIId.toString())){
@@ -252,8 +252,9 @@ public class CLI {
 
     public static void deletePOI(){
         System.out.println("Insert the name of the POI you want to remove"); //bisogna rimuovere anche tutte le reviews
-        String name = scanner.nextLine();
-        Document poi = POIConnector.findPOI(name);
+        //String name = scanner.nextLine();
+        //Document poi = POIConnector.findPOI(name);
+        Document poi = findPOIs();
         if(poi.getString("name").equals("0")){
             System.out.println("poi not found");
             return;
@@ -277,12 +278,12 @@ public class CLI {
                             for(Document r: reviews)
                                 ReviewConnector.insertReview(r.toJson());
                             CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
-                            POIConnector.insertPOI(poi.toJson());
+                            POIConnector.createPOI(poi.toJson());
                             System.out.println("not deleted");
                         }
                     }else{
                         CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
-                        POIConnector.insertPOI(poi.toJson());
+                        POIConnector.createPOI(poi.toJson());
                         System.out.println("not deleted");
                     }
                 }else{
@@ -290,13 +291,13 @@ public class CLI {
                         System.out.println("deleted");
                     }else{
                         CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
-                        POIConnector.insertPOI(poi.toJson());
+                        POIConnector.createPOI(poi.toJson());
                         System.out.println("not deleted");
                     }
 
                 }
             }else{
-                POIConnector.insertPOI(poi.toJson()); //controllare se _id resta uguale, in caso migliorare le reviews
+                POIConnector.createPOI(poi.toJson()); //controllare se _id resta uguale, in caso migliorare le reviews
                 System.out.println("not deleted");
             }
         }else{
