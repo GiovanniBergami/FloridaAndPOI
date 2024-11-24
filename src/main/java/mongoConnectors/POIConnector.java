@@ -112,6 +112,17 @@ public class POIConnector {
         doc = new Document("name","0");
         return doc;
     }
+
+    public static Document readPOI(ObjectId id){
+        Document doc;
+        doc = POIs.find(eq("_id", id)).first();
+
+        if(doc != null) {
+            return doc;
+        }
+        doc = new Document("name","0");
+        return doc;
+    }
     public static List<Document> readMultiplePOI(String name){
         List<Document> docs = new ArrayList<>();
         try (MongoCursor<Document> cursor = POIs.find(eq("name", name)).iterator())
@@ -500,7 +511,7 @@ public class POIConnector {
     }
     public static String ageSpan(String username){
 
-        int age = UserConnector.findUser(username).getInteger("age").intValue();
+        int age = UserConnector.readUser(username).getInteger("age").intValue();
         if(age<=15)
             return "0";
         if(age<=30)

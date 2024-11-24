@@ -349,7 +349,7 @@ public class CLI {
     }
     public static void removeUser(){
         System.out.println("Insert the name of the user you want to remove");
-        Document user = UserConnector.findUser(scanner.nextLine());
+        Document user = UserConnector.readUser(scanner.nextLine());
         if(user.getString("name").equals("0")){
             System.out.println("User not found");
         }else{
@@ -370,7 +370,7 @@ public class CLI {
 
     public static void findUser(){
         System.out.println("Enter user name");
-        Document user = UserConnector.findUser(scanner.nextLine());
+        Document user = UserConnector.readUser(scanner.nextLine());
         if(user.getString("name").equals("0")){
             System.out.println("User not found");
         }else{
@@ -420,7 +420,7 @@ public class CLI {
                     exitInnerLoops = false;
                     while(!exitInnerLoops) {
                         System.out.println("\nChoose Between:");
-                        action = chooseBetween(List.of("Search POI", "Get suggestions", "See plans", "best POI for age", "best POI for city", "go back"), "user/visit>");
+                        action = chooseBetween(List.of("Search POI", "Get suggestions", "See plans", "best POI for age", "best POI for city","read city", "go back"), "user/visit>");
                         switch (action) {
                             case 1:
                                 searchPOI();
@@ -455,6 +455,9 @@ public class CLI {
                                 System.out.println(POIConnector.bestPOIinCity(data.get(0)));
                                 break;
                             case 6:
+                                readCity();
+                                break;
+                            case 7:
                                 exitInnerLoops = true;
                                 break;
                             default:
@@ -471,7 +474,7 @@ public class CLI {
                             case 1:
                                 System.out.println("Search user: insert name");
                                 String searchedName = scanner.nextLine();
-                                Document user = UserConnector.findUser(searchedName);
+                                Document user = UserConnector.readUser(searchedName);
                                 if (user.getString("name").equals("0")) {
                                     System.out.println("User not found");
                                 } else {
@@ -635,6 +638,52 @@ public class CLI {
         }
     }
 
+    public static void readCity(){
+        List<String> data;
+        System.out.println("Insert name of the city");
+        Document city = CityConnector.readCity(scanner.nextLine());
+        if (city.getString("name").equals("0")) {
+            System.out.println("city not found");
+            return;
+        } else {
+            System.out.println(city.toJson());
+        }
+        int c = chooseBetween(List.of("See pois", "Go back"), "user");
+        switch (c) {
+            case 1:
+                Document poi;
+                int poiIndex = 0;
+                List<ObjectId> poi_ids = city.getList("POI_ids", ObjectId.class);
+                if(poi_ids.size()==0)
+                    return;
+                while(true) {
+                    System.out.println("see other pois?");
+                    int d = chooseBetween(List.of("yes", "no"), "user");
+                    switch (d) {
+                        case 1:
+                            for (int j = poiIndex; j < poiIndex + 3; j++) {
+                                poi = POIConnector.readPOI(poi_ids.get(j));
+                                System.out.println(poi.toJson());
+                                if (j == (poi_ids.size() - 1)) {
+                                    System.out.println("pois ended");
+                                    return;
+                                }
+                            }
+                            poiIndex = poiIndex + 3;
+                            break;
+                        case 2:
+                            return;
+                    }
+
+                }
+
+            case 2:
+                break;
+            default:
+                System.out.println("wrong input, retry");
+        }
+    }
+
     public static void unsignedUser(){
         boolean exit = false;
         while(!exit){
@@ -774,7 +823,7 @@ public class CLI {
         username = scanner.nextLine();
         System.out.println("Insert password");
         password = scanner.nextLine();
-        Document user = UserConnector.findUser(username,password,admin);
+        Document user = UserConnector.readUser(username,password,admin);
         if(user.getString("name").equals("0")){
             return false;
         }else{
@@ -795,7 +844,7 @@ public class CLI {
         age = scanner.nextInt();
         scanner.nextLine();
         ObjectId mongoId;
-        if(UserConnector.findUser(username).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
+        if(UserConnector.readUser(username).getString("name").equals("0")){ //find user find a user with the same data. if it doesn't exists, the output is a doc {"name","0"}. if it is like that, is okay to insert a new user
             mongoId = UserConnector.createUser(username,password,age);
             if(mongoId != null) {
                 if (neoConnector.addUser(username, mongoId.toString())) {
@@ -894,7 +943,7 @@ public class CLI {
     }
     public static String ageSpan(String username){
 
-        int age = UserConnector.findUser(username).getInteger("age").intValue();
+        int age = UserConnector.readUser(username).getInteger("age").intValue();
         if(age<=15)
             return "0";
         if(age<=30)

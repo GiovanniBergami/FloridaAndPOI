@@ -1,7 +1,6 @@
 package mongoConnectors;
 
 import com.mongodb.client.*;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 import neoConnectors.neoConnector;
 import org.bson.Document;
@@ -69,7 +68,7 @@ public class UserConnector {
 
     //READ
 
-    public static Document findUser(String username,String password,boolean admin){
+    public static Document readUser(String username, String password, boolean admin){
         Document doc;
         if(admin) {
             doc = users.find(and(eq("name", username), eq("password", password), eq("admin", "1"))).first();
@@ -83,7 +82,7 @@ public class UserConnector {
         return doc;
     }
 
-    public static Document findUser(String username){
+    public static Document readUser(String username){
         Document doc;
         doc = users.find(eq("name", username)).first();
         if(doc == null) {
