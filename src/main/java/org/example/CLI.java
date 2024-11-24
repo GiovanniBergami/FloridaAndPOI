@@ -395,170 +395,225 @@ public class CLI {
 
     public static void user(){
         boolean exit = false;
+        boolean exitInnerLoops = false;
         List<String> data;
         while(!exit){
-            System.out.println("Which action do you want to take?");
-            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends",
-                    "See friendship proposal","See plans","propose similar users","see friends plans","Go back"),"user> ");
-            switch(action){
+            System.out.println("What do you want to do?");
+//            int action = chooseBetween(List.of("Search POI","Get suggestions","Delete Profile","Search Users","See friends",
+//                    "See friendship proposal","See plans","propose similar users","see friends plans","Go back"),"user> ");
+            int section = chooseBetween(List.of("Visit","Friends","Profile","Log out"),"user>");
+            int action;
+            switch(section){
                 case 1:
-                    Document poi = findPOI();
-                    if(poi.getString("name").equals("0")){
-                        System.out.println("POI not found");
-                    }else{
-                        System.out.println(poi.toJson());
-                    }
-                    int c = chooseBetween(List.of("See reviews","Add review","Remove review","Plan to visit","Go back"),"user");
-                    switch(c){
-                        case 1:
-                            findReviews(poi);
-                            break;
-                        case 2:
-                            addReview(poi);
-                            break;
-                        case 3:
-                            data = insert(List.of("Insert the _id of the review you want to remove","date"));
-//                            String id_exa = scanner.nextLine();
-                            ObjectId review_id = new ObjectId(data.get(0));
-
-                            Document review = ReviewConnector.getReview(review_id);
-
-                            if(POIConnector.removeReviewFromPOI(poi.getObjectId("_id"),review_id)) {
-                                if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
-                                    if(neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))){
-                                        System.out.println("deleted");
-                                    }else{
-                                        ReviewConnector.insertReview(review.toJson());
-                                        POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
-                                        System.out.println("Not deleted");
-                                    }
-                                } else {
-                                    POIConnector.addReviewToPOI(poi.getObjectId("_id"),review_id);
-                                    System.out.println("Not deleted");
-                                }
-                            }else{
-                                System.out.println("not deleted");
-                            }
-                            break;
-                        case 4:
-                            System.out.println("plan to visit");
-                            System.out.println("Coincidences found among your frinds:");
-                            data = neoConnector.findCoincidence(poi.getObjectId("_id").toString(),sessionUser.getString("name"));
-                            if(data.size()!=0){
-                                for(String coincidence : data){
-                                    System.out.println(coincidence);
-                                }
-                            }else{
-                                System.out.println("no coincidence found");
-                            }
-                            System.out.println("Insert date yyyy-MM-dd");
-                            String date = scanner.nextLine();
-                            neoConnector.addPlan(poi.getObjectId("_id").toString(),sessionUser.getString("name"), date);
-                            //sout eventuali coincidenze
-                            break;
-                        case 5:
-                            break;
-                        default:
-                            System.out.println("wrong input, retry");
-                    }
-
-
-                    break;
-                case 2:
-                    data = neoConnector.recommendPOI(sessionUser.getString("name"));
-                    for(String d: data){
-                        System.out.println(d);
-                        //System.out.println("");
-                    }
-                    break;
-                case 3:
-                    deleteProfile();
-                    break;
-                case 4:
-                    System.out.println("Search user: insert name");
-                    String searchedName= scanner.nextLine();
-                    Document user = UserConnector.findUser(searchedName);
-                    if(user.getString("name").equals("0")){
-                        System.out.println("User not found");
-                    }else{
-                        System.out.println(user.toJson());
-                        System.out.println("Do you want to propose friendship?");
-                        switch(chooseBetween(List.of("Yes","No"),"")){
+                    exitInnerLoops = false;
+                    while(!exitInnerLoops) {
+                        System.out.println("\nChoose Between:");
+                        action = chooseBetween(List.of("Search POI", "Get suggestions", "See plans", "best POI for age", "best POI for city", "go back"), "user/visit>");
+                        switch (action) {
                             case 1:
-                                neoConnector.addFriendshipRequest(sessionUser.getString("name"),searchedName);
+                                Document poi = findPOI();
+                                if (poi.getString("name").equals("0")) {
+                                    System.out.println("POI not found");
+                                } else {
+                                    System.out.println(poi.toJson());
+                                }
+                                int c = chooseBetween(List.of("See reviews", "Add review", "Remove review", "Plan to visit", "Go back"), "user");
+                                switch (c) {
+                                    case 1:
+                                        findReviews(poi);
+                                        break;
+                                    case 2:
+                                        addReview(poi);
+                                        break;
+                                    case 3:
+                                        data = insert(List.of("Insert the _id of the review you want to remove", "date"));
+//                            String id_exa = scanner.nextLine();
+                                        ObjectId review_id = new ObjectId(data.get(0));
+
+                                        Document review = ReviewConnector.getReview(review_id);
+
+                                        if (POIConnector.removeReviewFromPOI(poi.getObjectId("_id"), review_id)) {
+                                            if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
+                                                if (neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))) {
+                                                    System.out.println("deleted");
+                                                } else {
+                                                    ReviewConnector.insertReview(review.toJson());
+                                                    POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
+                                                    System.out.println("Not deleted");
+                                                }
+                                            } else {
+                                                POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
+                                                System.out.println("Not deleted");
+                                            }
+                                        } else {
+                                            System.out.println("not deleted");
+                                        }
+                                        break;
+                                    case 4:
+                                        System.out.println("plan to visit");
+                                        System.out.println("Coincidences found among your frinds:");
+                                        data = neoConnector.findCoincidence(poi.getObjectId("_id").toString(), sessionUser.getString("name"));
+                                        if (data.size() != 0) {
+                                            for (String coincidence : data) {
+                                                System.out.println(coincidence);
+                                            }
+                                        } else {
+                                            System.out.println("no coincidence found");
+                                        }
+                                        System.out.println("Insert date yyyy-MM-dd");
+                                        String date = scanner.nextLine();
+                                        neoConnector.addPlan(poi.getObjectId("_id").toString(), sessionUser.getString("name"), date);
+                                        //sout eventuali coincidenze
+                                        break;
+                                    case 5:
+                                        break;
+                                    default:
+                                        System.out.println("wrong input, retry");
+                                }
                                 break;
                             case 2:
+                                data = neoConnector.recommendPOI(sessionUser.getString("name"));
+                                for (String d : data) {
+                                    System.out.println(d);
+                                    //System.out.println("");
+                                }
+                                break;
+                            case 3:
+                                List<String> plans = neoConnector.getPlans(sessionUser.getString("name"));
+                                for (String d : plans) {
+                                    System.out.println(d);
+                                    System.out.println("");
+                                }
+                                System.out.println("do you want to remove one of them?");
+                                if (chooseBetween(List.of("yes", "no"), "") == 1) {
+                                    List<String> input = insert(List.of("poi id", "date yyyy-MM-dd"));
+                                    neoConnector.removePlan(input.get(0), sessionUser.getString("name"), input.get(1));
+                                }
+                                break;
+                            case 4:
+                                System.out.println("insert an age span");
+                                int a = scanner.nextInt();
+                                scanner.nextLine();
+                                System.out.println(POIConnector.bestPOIForAge(a));
+                                break;
+                            case 5:
+                                data = insert(List.of("Insert a city"));
+                                System.out.println(POIConnector.bestPOIinCity(data.get(0)));
+                                break;
+                            case 6:
+                                exitInnerLoops = true;
                                 break;
                             default:
                                 System.out.println("wrong input");
                         }
                     }
+                    break;
+                case 2:
+                    exitInnerLoops = false;
+                    while(!exitInnerLoops) {
+                        System.out.println("\nChoose between:");
+                        action = chooseBetween(List.of("search users", "See Friends", "see friendship requests", "Get friends recommendation", "visualize friends calendar", "go back"), "user/friends>");
+                        switch (action) {
+                            case 1:
+                                System.out.println("Search user: insert name");
+                                String searchedName = scanner.nextLine();
+                                Document user = UserConnector.findUser(searchedName);
+                                if (user.getString("name").equals("0")) {
+                                    System.out.println("User not found");
+                                } else {
+                                    System.out.println(user.toJson());
+                                    System.out.println("Do you want to propose friendship?");
+                                    switch (chooseBetween(List.of("Yes", "No"), "")) {
+                                        case 1:
+                                            neoConnector.addFriendshipRequest(sessionUser.getString("name"), searchedName);
+                                            break;
+                                        case 2:
+                                            break;
+                                        default:
+                                            System.out.println("wrong input");
+                                    }
+                                }
 
-                    //se user viene trovato è possibile proporgli l'amicizia, se non è già amico
-                    break;
-                case 5:
-                    System.out.println("Friends list:");
-                    neoConnector.getFriends(sessionUser.getString("name"));
-                    System.out.println("Do you want to delete a friendship?");
-                    switch(chooseBetween(List.of("Yes","No"),"")){
-                        case 1:
-                            System.out.println("Insert name");
-                            neoConnector.deleteFriendship(sessionUser.getString("name"), scanner.nextLine());
-                            break;
-                        case 2:
-                            break;
-                        default:
-                            System.out.println("wrong input");
-                    }
-                    break;
-                case 6:
-                    System.out.println("Friendship proposal:");   //CONTROLLARE SE FUNZIONA
-                    String sessionUserName = sessionUser.getString("name");
-                    neoConnector.getRequested(sessionUserName); //SE SPLITTI CLIENT SERVER BISOGNA PASSARE IL RISULTATO
-                    System.out.println("do you want to accept some request?");
-                    switch(chooseBetween(List.of("yes","no"),"")){
-                        case 1:
-                            System.out.println("enter the name of the requester");
-                            String requester = scanner.nextLine();
-                            neoConnector.deleteRequest(requester,sessionUserName);
-                            neoConnector.addFriendship(requester,sessionUserName);
-                            break;
-                        case 2:
-                            break;
-                        default:
-                            System.out.println("wrong input");
-                    }
+                                //se user viene trovato è possibile proporgli l'amicizia, se non è già amico
+                                break;
+                            case 2:
+                                System.out.println("Friends list:");
+                                neoConnector.getFriends(sessionUser.getString("name"));
+                                System.out.println("Do you want to delete a friendship?");
+                                switch (chooseBetween(List.of("Yes", "No"), "")) {
+                                    case 1:
+                                        System.out.println("Insert name");
+                                        neoConnector.deleteFriendship(sessionUser.getString("name"), scanner.nextLine());
+                                        break;
+                                    case 2:
+                                        break;
+                                    default:
+                                        System.out.println("wrong input");
+                                }
+                                break;
+                            case 3:
+                                System.out.println("Friendship proposal:");   //CONTROLLARE SE FUNZIONA
+                                String sessionUserName = sessionUser.getString("name");
+                                neoConnector.getRequested(sessionUserName); //SE SPLITTI CLIENT SERVER BISOGNA PASSARE IL RISULTATO
+                                System.out.println("do you want to accept some request?");
+                                switch (chooseBetween(List.of("yes", "no"), "")) {
+                                    case 1:
+                                        System.out.println("enter the name of the requester");
+                                        String requester = scanner.nextLine();
+                                        neoConnector.deleteRequest(requester, sessionUserName);
+                                        neoConnector.addFriendship(requester, sessionUserName);
+                                        break;
+                                    case 2:
+                                        break;
+                                    default:
+                                        System.out.println("wrong input");
+                                }
 
-                    break;
-                case 7:
-                    List<String> plans =neoConnector.getPlans(sessionUser.getString("name"));
-                    for(String d: plans){
-                        System.out.println(d);
-                        System.out.println("");
-                    }
-                    System.out.println("do you want to remove one of them?");
-                    if(chooseBetween(List.of("yes","no"),"")==1){
-                        List<String> input = insert(List.of("poi id","date yyyy-MM-dd"));
-                        neoConnector.removePlan(input.get(0),sessionUser.getString("name"),input.get(1));
-                    }
-                    break;
-                case 8:
-                    data = neoConnector.similarUser(sessionUser.getString("name"));
-                    for(String d: data)
-                        System.out.println(d);
-                    break;
-                case 9:
-                    data = neoConnector.findFriendPlans(sessionUser.getString("name"));
-                    for(String d: data){
-                        System.out.println(d);
+                                break;
+
+                            case 4:
+                                data = neoConnector.similarUser(sessionUser.getString("name"));
+                                for (String d : data)
+                                    System.out.println(d);
+                                break;
+                            case 5:
+                                data = neoConnector.findFriendPlans(sessionUser.getString("name"));
+                                for (String d : data) {
+                                    System.out.println(d);
+                                }
+                                break;
+                            case 6:
+                                exitInnerLoops = true;
+                                break;
+                            default:
+                                System.out.println("wrong input, retry");
+                        }
                     }
                     break;
-                case 10:
+                case 3:
+                    exitInnerLoops = false;
+                    while(!exitInnerLoops) {
+                        System.out.println("\nChoose between:");
+                        action = chooseBetween(List.of("Delete Profile", "Update profile", "go back"), "user/profile>");
+                        switch (action) {
+                            case 1:
+                                deleteProfile();
+                                break;
+                            case 2:
+                                System.out.println("todo");
+                            case 3:
+                                exitInnerLoops = true;
+                                break;
+                            default:
+                                System.out.println("wrong input, retry");
+                        }
+                    }
+                    break;
+                case 4:
                     exit = true;
                     break;
                 default:
-                    System.out.println("wrong input, retry");
-
+                    System.out.println("wrong input");
             }
         }
     }
