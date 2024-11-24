@@ -42,7 +42,7 @@ public class ReviewConnector {
     }
 
 
-    public static Document getReview(ObjectId id){
+    public static Document readReview(ObjectId id){
         Document review = reviews.find(eq("_id",id)).first();
 
         if(review != null) {
@@ -53,7 +53,7 @@ public class ReviewConnector {
 
     }
     //CREATE
-    public static int insertReviews(String jsonPath) {
+    public static int createReviewsFromJsonPath(String jsonPath) {
 
         String line;
         Document doc;
@@ -73,7 +73,7 @@ public class ReviewConnector {
         return 0;
     }
 
-    public static org.bson.types.ObjectId insertReview(String username, String date, String text, int rating){
+    public static org.bson.types.ObjectId createReview(String username, String date, String text, int rating){
 
         Document doc;
         doc =  new Document("username",username)
@@ -142,7 +142,7 @@ public class ReviewConnector {
 
 
     }
-    public static boolean insertReview(String jsonReview){  //rename insert in create and get in find TODO rename stuff
+    public static boolean createReview(String jsonReview){
         Document doc = Document.parse(jsonReview);
         try {
             reviews.insertOne(doc);

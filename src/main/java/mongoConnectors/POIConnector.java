@@ -144,7 +144,7 @@ public class POIConnector {
     }
 
     public static boolean addReviewToPOI(ObjectId poi_id, ObjectId review_id){
-        Document review = ReviewConnector.getReview(review_id);
+        Document review = ReviewConnector.readReview(review_id);
         String ageSpan = ageSpan(review.getString("username"));
         int stars = review.getInteger("stars").intValue();
         Document filter = new Document("_id",poi_id);
@@ -181,7 +181,7 @@ public class POIConnector {
     }
 
     public static boolean removeReviewFromPOI(ObjectId poi_id, ObjectId review_id){
-        Document review = ReviewConnector.getReview(review_id);
+        Document review = ReviewConnector.readReview(review_id);
         String ageSpan = ageSpan(review.getString("username"));
         int stars = review.getInteger("stars").intValue();
         Document filter = new Document("_id",poi_id);
@@ -234,7 +234,7 @@ public class POIConnector {
                 String poi_id = poi.getObjectId("_id").toString();
                 List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
                 for(ObjectId review_id: review_ids){
-                    review = ReviewConnector.getReview(review_id);
+                    review = ReviewConnector.readReview(review_id);
                    // System.out.println(review.toJson());
                     //System.out.println(review.getString("name"));
                     neoConnector.addVisit(poi_id,review.getString("username"),review.getDouble("stars"),review.getString("date")); //aggiungiamo una visita tra il poi e l'user. assumiamo ci sia un indice sul nome dell'user sennò è un casino

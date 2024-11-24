@@ -96,7 +96,7 @@ public class CLI {
                             break;
                         case 3:
                             System.out.println("Insert Reviews, specify path");
-                            ReviewConnector.insertReviews(scanner.nextLine());
+                            ReviewConnector.createReviewsFromJsonPath(scanner.nextLine());
                             ReviewConnector.count();
                             break;
                         case 4:
@@ -264,7 +264,7 @@ public class CLI {
         List<Document> reviews = new ArrayList<>();
         List<ObjectId> review_ids = poi.getList("review_ids", ObjectId.class);
         for(ObjectId review_id : review_ids ){
-            reviews.add(ReviewConnector.getReview(review_id));
+            reviews.add(ReviewConnector.readReview(review_id));
         }
 
         if(POIConnector.remove(id)){
@@ -276,7 +276,7 @@ public class CLI {
                             System.out.println("deleted");
                         }else{
                             for(Document r: reviews)
-                                ReviewConnector.insertReview(r.toJson());
+                                ReviewConnector.createReview(r.toJson());
                             CityConnector.addPOIToCityName(poi.getString("city"),poi.getObjectId("_id"));
                             POIConnector.createPOI(poi.toJson());
                             System.out.println("not deleted");
@@ -314,19 +314,19 @@ public class CLI {
         String userName = scanner.nextLine();
         System.out.println("insert date");
         String date = scanner.nextLine();
-        Document review = ReviewConnector.getReview(review_id);
+        Document review = ReviewConnector.readReview(review_id);
 
         if(ReviewConnector.remove(review_id,"")){
             if(POIConnector.removeReviewFromPOI(poi_id,review_id)){
                 if(neoConnector.removeVisit(poi_id.toString(),userName,date)){
                     System.out.println("Deleted");
                 }else{
-                    ObjectId newId = ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
+                    ObjectId newId = ReviewConnector.createReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
                     POIConnector.addReviewToPOI(poi_id,newId);
                     System.out.println("not deleted");
                 }
             }else{
-                ReviewConnector.insertReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
+                ReviewConnector.createReview(review.getString("username"),review.getString("date"),review.getString("text"),review.getInteger("stars").intValue());
                 System.out.println("not deleted");
             }
         }else{
@@ -579,14 +579,14 @@ public class CLI {
 //                            String id_exa = scanner.nextLine();
                 ObjectId review_id = new ObjectId(data.get(0));
 
-                Document review = ReviewConnector.getReview(review_id);
+                Document review = ReviewConnector.readReview(review_id);
 
                 if (POIConnector.removeReviewFromPOI(poi.getObjectId("_id"), review_id)) {
                     if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
                         if (neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))) {
                             System.out.println("deleted");
                         } else {
-                            ReviewConnector.insertReview(review.toJson());
+                            ReviewConnector.createReview(review.toJson());
                             POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
                             System.out.println("Not deleted");
                         }
@@ -703,7 +703,7 @@ public class CLI {
             switch (c) {
                 case 1:
                     for (int j = reviewIndex; j < reviewIndex + 3; j++) {
-                        review = ReviewConnector.getReview(review_ids.get(j));
+                        review = ReviewConnector.readReview(review_ids.get(j));
                         System.out.println(review.toJson());
                         if (j == (review_ids.size() - 1)) {
                             System.out.println("Reviews ended");
@@ -733,7 +733,7 @@ public class CLI {
         int stars = scanner.nextInt();
         scanner.nextLine();
 
-        ObjectId review_id = ReviewConnector.insertReview(name,date,text,stars);
+        ObjectId review_id = ReviewConnector.createReview(name,date,text,stars);
         if(review_id != null) {
             if(POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id)){
                 if(neoConnector.addVisit(poi.getObjectId("_id").toString(),sessionUser.getString("name"),Double.valueOf(stars),date)){
