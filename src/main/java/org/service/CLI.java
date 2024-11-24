@@ -1,4 +1,4 @@
-package org.example;
+package org.service;
 
 import mongoConnectors.CityConnector;
 import mongoConnectors.POIConnector;
