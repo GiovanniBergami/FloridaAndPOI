@@ -666,14 +666,14 @@ public class CLI {
     public static Document findPOI(){
         System.out.println("Insert POI name");
         String POIname = scanner.nextLine();
-        Document doc = POIConnector.findPOI(POIname);
+        Document doc = POIConnector.readPOI(POIname);
         return doc;
     }
 
     public static Document findPOIs(){
         System.out.println("insert poi name");
         String poiName = scanner.nextLine();
-        List<Document> pois = POIConnector.findMultiplePOI(poiName);
+        List<Document> pois = POIConnector.readMultiplePOI(poiName);
         if(pois.size()==0)
             return new Document("name","0");
         if(pois.size()==1)

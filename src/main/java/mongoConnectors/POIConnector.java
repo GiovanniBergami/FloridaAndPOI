@@ -102,7 +102,7 @@ public class POIConnector {
         }
     }
 
-    public static Document findPOI(String name){
+    public static Document readPOI(String name){
         Document doc;
         doc = POIs.find(eq("name", name)).first();
 
@@ -112,7 +112,7 @@ public class POIConnector {
         doc = new Document("name","0");
         return doc;
     }
-    public static List<Document> findMultiplePOI(String name){
+    public static List<Document> readMultiplePOI(String name){
         List<Document> docs = new ArrayList<>();
         try (MongoCursor<Document> cursor = POIs.find(eq("name", name)).iterator())
         {
