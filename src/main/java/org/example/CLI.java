@@ -411,65 +411,7 @@ public class CLI {
                         action = chooseBetween(List.of("Search POI", "Get suggestions", "See plans", "best POI for age", "best POI for city", "go back"), "user/visit>");
                         switch (action) {
                             case 1:
-                                Document poi = findPOI();
-                                if (poi.getString("name").equals("0")) {
-                                    System.out.println("POI not found");
-                                } else {
-                                    System.out.println(poi.toJson());
-                                }
-                                int c = chooseBetween(List.of("See reviews", "Add review", "Remove review", "Plan to visit", "Go back"), "user");
-                                switch (c) {
-                                    case 1:
-                                        findReviews(poi);
-                                        break;
-                                    case 2:
-                                        addReview(poi);
-                                        break;
-                                    case 3:
-                                        data = insert(List.of("Insert the _id of the review you want to remove", "date"));
-//                            String id_exa = scanner.nextLine();
-                                        ObjectId review_id = new ObjectId(data.get(0));
-
-                                        Document review = ReviewConnector.getReview(review_id);
-
-                                        if (POIConnector.removeReviewFromPOI(poi.getObjectId("_id"), review_id)) {
-                                            if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
-                                                if (neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))) {
-                                                    System.out.println("deleted");
-                                                } else {
-                                                    ReviewConnector.insertReview(review.toJson());
-                                                    POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
-                                                    System.out.println("Not deleted");
-                                                }
-                                            } else {
-                                                POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
-                                                System.out.println("Not deleted");
-                                            }
-                                        } else {
-                                            System.out.println("not deleted");
-                                        }
-                                        break;
-                                    case 4:
-                                        System.out.println("plan to visit");
-                                        System.out.println("Coincidences found among your frinds:");
-                                        data = neoConnector.findCoincidence(poi.getObjectId("_id").toString(), sessionUser.getString("name"));
-                                        if (data.size() != 0) {
-                                            for (String coincidence : data) {
-                                                System.out.println(coincidence);
-                                            }
-                                        } else {
-                                            System.out.println("no coincidence found");
-                                        }
-                                        System.out.println("Insert date yyyy-MM-dd");
-                                        String date = scanner.nextLine();
-                                        neoConnector.addPlan(poi.getObjectId("_id").toString(), sessionUser.getString("name"), date);
-                                        //sout eventuali coincidenze
-                                        break;
-                                    case 5:
-                                        break;
-                                    default:
-                                        System.out.println("wrong input, retry");
-                                }
+                                searchPOI();
                                 break;
                             case 2:
                                 data = neoConnector.recommendPOI(sessionUser.getString("name"));
@@ -615,6 +557,69 @@ public class CLI {
                 default:
                     System.out.println("wrong input");
             }
+        }
+    }
+
+    public static void searchPOI(){
+        List<String> data;
+        Document poi = findPOI();
+        if (poi.getString("name").equals("0")) {
+            System.out.println("POI not found");
+        } else {
+            System.out.println(poi.toJson());
+        }
+        int c = chooseBetween(List.of("See reviews", "Add review", "Remove review", "Plan to visit", "Go back"), "user");
+        switch (c) {
+            case 1:
+                findReviews(poi);
+                break;
+            case 2:
+                addReview(poi);
+                break;
+            case 3:
+                data = insert(List.of("Insert the _id of the review you want to remove", "date"));
+//                            String id_exa = scanner.nextLine();
+                ObjectId review_id = new ObjectId(data.get(0));
+
+                Document review = ReviewConnector.getReview(review_id);
+
+                if (POIConnector.removeReviewFromPOI(poi.getObjectId("_id"), review_id)) {
+                    if (ReviewConnector.remove(review_id, sessionUser.getString("name"))) {
+                        if (neoConnector.removeVisit(poi.getObjectId("_id").toString(), sessionUser.getString("name"), data.get(1))) {
+                            System.out.println("deleted");
+                        } else {
+                            ReviewConnector.insertReview(review.toJson());
+                            POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
+                            System.out.println("Not deleted");
+                        }
+                    } else {
+                        POIConnector.addReviewToPOI(poi.getObjectId("_id"), review_id);
+                        System.out.println("Not deleted");
+                    }
+                } else {
+                    System.out.println("not deleted");
+                }
+                break;
+            case 4:
+                System.out.println("plan to visit");
+                System.out.println("Coincidences found among your frinds:");
+                data = neoConnector.findCoincidence(poi.getObjectId("_id").toString(), sessionUser.getString("name"));
+                if (data.size() != 0) {
+                    for (String coincidence : data) {
+                        System.out.println(coincidence);
+                    }
+                } else {
+                    System.out.println("no coincidence found");
+                }
+                System.out.println("Insert date yyyy-MM-dd");
+                String date = scanner.nextLine();
+                neoConnector.addPlan(poi.getObjectId("_id").toString(), sessionUser.getString("name"), date);
+                //sout eventuali coincidenze
+                break;
+            case 5:
+                break;
+            default:
+                System.out.println("wrong input, retry");
         }
     }
 
