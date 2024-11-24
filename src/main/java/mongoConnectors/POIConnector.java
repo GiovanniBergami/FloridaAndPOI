@@ -116,6 +116,17 @@ public class POIConnector {
         doc = new Document("name","0");
         return doc;
     }
+    public static List<Document> findMultiplePOI(String name){
+        List<Document> docs = new ArrayList<>();
+        try (MongoCursor<Document> cursor = POIs.find(eq("name", name)).iterator())
+        {
+            while (cursor.hasNext())
+            {
+                docs.add(cursor.next());
+            }
+        }
+        return docs;
+    }
     //UPDATE
     public static boolean updateFieldPOI(ObjectId poi_id,String field,String value){ //sarebbe più veloce fare una operazione sola, ma non è un problema tanto dovrebbe accadere molto raramente.
         Document filter = new Document("_id",poi_id);

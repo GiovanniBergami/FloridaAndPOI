@@ -6,11 +6,8 @@ import mongoConnectors.ReviewConnector;
 import mongoConnectors.UserConnector;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import neoConnectors.neoConnector;
 import org.bson.Document;
@@ -60,7 +57,7 @@ public class CLI {
                             createPOI();
                             break;
                         case 2:
-                            Document poi = findPOI();
+                            Document poi = findPOIs();
                             System.out.println(poi);
                             break;
                         case 3:
@@ -92,7 +89,7 @@ public class CLI {
                             "Import collection from json","Read first n","Go back"),"admin/Reviews> ");
                     switch(action){
                         case 1:
-                            findReviews(findPOI());
+                            findReviews(findPOIs());
                             break;
                         case 2:
                             removeReview();
@@ -368,7 +365,7 @@ public class CLI {
 
     public static void updatePOI(){
         System.out.println("Insert the name of the poi to update");
-        Document poi = findPOI();
+        Document poi = findPOIs();
         System.out.println(poi);
         boolean exit = false;
         while(!exit){
@@ -562,7 +559,7 @@ public class CLI {
 
     public static void searchPOI(){
         List<String> data;
-        Document poi = findPOI();
+        Document poi = findPOIs();
         if (poi.getString("name").equals("0")) {
             System.out.println("POI not found");
         } else {
@@ -640,7 +637,7 @@ public class CLI {
                     register();
                     break;
                 case 3:
-                    Document poi = findPOI();
+                    Document poi = findPOIs();
                     if(poi.getString("name").equals("0")){
                         System.out.println("POI not found");
                     }else{
@@ -670,6 +667,26 @@ public class CLI {
         String POIname = scanner.nextLine();
         Document doc = POIConnector.findPOI(POIname);
         return doc;
+    }
+
+    public static Document findPOIs(){
+        System.out.println("insert poi name");
+        String poiName = scanner.nextLine();
+        List<Document> pois = POIConnector.findMultiplePOI(poiName);
+        if(pois.size()==0)
+            return new Document("name","0");
+        if(pois.size()==1)
+            return pois.get(0);
+        int i = 1;
+        for(Document poi: pois){
+            System.out.println("\n"+i+" - "+poi.toJson());
+            i++;
+        }
+        System.out.println("\nChoose and insert the number");
+        int c = scanner.nextInt();
+        scanner.nextLine();
+        return pois.get(c-1);
+
     }
 
     public static boolean findReviews(Document poi){
