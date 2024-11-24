@@ -1,6 +1,5 @@
 package mongoConnectors;
 
-import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.DeleteResult;
@@ -10,8 +9,6 @@ import org.bson.types.ObjectId;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -23,24 +20,23 @@ public class CityConnector {
 
     //CREATE
 
-    public static ObjectId insertCity(String name, String address, String city){
+    public static ObjectId createCity(String name){
 
         Document doc;
         doc =  new Document("name",name)
                 .append("POI_count",0)
-                .append("visits",0)
                 .append("POI_ids",new ArrayList<>());
         cities.insertOne(doc);
 
         return doc.getObjectId("_id");
     }
-    public static int insertCity(String jsonPOI){
+    public static int createCityFromJson(String jsonPOI){
         Document doc = Document.parse(jsonPOI);
         cities.insertOne(doc);
         System.out.println("inserimento avvenuto: ");
         return 0;
     }
-    public static int insertCities(String jsonPath){
+    public static int createCitiesFromJsonFile(String jsonPath){
 
         String line;
         Document doc;
@@ -84,7 +80,7 @@ public class CityConnector {
         }
     }
 
-    public static Document findCity(String name){
+    public static Document readCity(String name){
         Document doc;
         doc = cities.find(eq("name", name)).first();
 
@@ -121,8 +117,8 @@ public class CityConnector {
         }
     }
     //DELETE
-    public static boolean remove(ObjectId id){
-        Document filter = new Document("_id",id);
+    public static boolean remove(String name){
+        Document filter = new Document("name",name);
         DeleteResult result = cities.deleteOne(filter);
         if(result.getDeletedCount()>0){
             return true;

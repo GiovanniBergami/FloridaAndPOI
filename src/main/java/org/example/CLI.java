@@ -150,26 +150,40 @@ public class CLI {
                     }
                     break;
                 case 4:
-                    action = chooseBetween(List.of("Import",
-                            "Import collection from json","Read all collection","Go back"),"admin/Cities>");
+                    action = chooseBetween(List.of("Create","Delete",
+                            "Import collection from json","Read all collection","read city","Go back"),"admin/Cities>");
                     switch(action){
                         case 1:
-                            System.out.println("Insert path");
-                            CityConnector.insertCities(scanner.nextLine());
+                            System.out.println("Create city");
+                            data = insert(List.of("Name"));
+                            if(CityConnector.readCity(data.get(0)).getString("name").equals("0")){
+                                CityConnector.createCity(data.get(0));
+                            }else{
+                                System.out.println("name already present");
+                            }
                             break;
                         case 2:
-                            System.out.println("Insert Cities, specify path");
-                            CityConnector.insertCities(scanner.nextLine());
-                            CityConnector.count();
+                            System.out.println("Delete city");
+                            data = insert(List.of("Name"));
+                            CityConnector.remove(data.get(0));
                             break;
                         case 3:
+                            System.out.println("Insert Cities, specify path");
+                            CityConnector.createCitiesFromJsonFile(scanner.nextLine());
+                            CityConnector.count();
+                            break;
+                        case 4:
                             System.out.println("how many?");
                             int n = scanner.nextInt();
                             scanner.nextLine();
                             CityConnector.printCollection(n);
                             CityConnector.count();
                             break;
-                        case 4:
+                        case 5:
+                            System.out.println("insert name");
+                            System.out.println(CityConnector.readCity(scanner.nextLine()).toJson());
+                            break;
+                        case 6:
                             break;
                         default:
                             System.out.println("wrong input");
@@ -216,7 +230,7 @@ public class CLI {
     public static void createPOI(){
         System.out.println("Insert city of the POI");
         String city = scanner.nextLine();
-        Document cityOfPOI = CityConnector.findCity(city);
+        Document cityOfPOI = CityConnector.readCity(city);
         if(cityOfPOI.getString("name").equals("0")){
             System.out.println("The city doesn't exist");
             return;
