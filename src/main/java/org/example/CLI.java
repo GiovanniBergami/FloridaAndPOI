@@ -216,37 +216,37 @@ public class CLI {
     public static void createPOI(){
         System.out.println("Insert city of the POI");
         String city = scanner.nextLine();
-        Document cityOfPOI = CityConnector.findCity(city); //ci vorrà un index sui nomi di città
+        Document cityOfPOI = CityConnector.findCity(city);
         if(cityOfPOI.getString("name").equals("0")){
             System.out.println("The city doesn't exist");
             return;
         }else{
             System.out.println("Insert name of POI");
             String name = scanner.nextLine();
-            if(!POIConnector.findPOI(name).getString("name").equals("0")){
-                System.out.println("This name already exists");
-                return;
-            }else{
-                System.out.println("Insert address");
-                String address = scanner.nextLine();
-                ObjectId newPOIId =POIConnector.createPOI(name,address,city);
-                if(newPOIId != null) {
-                    if(CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"), newPOIId)){
-                        if(neoConnector.addPOI(name, newPOIId.toString())){
-                            System.out.println("The POI has been added");
-                        }else{
-                            CityConnector.removePOIFromCity(cityOfPOI.getString("name"),newPOIId);
-                            POIConnector.remove(newPOIId);
-                            System.out.println("no poi added");
-                        }
+//            if(!POIConnector.findPOI(name).getString("name").equals("0")){
+//                System.out.println("This name already exists");
+//                return;
+//            }else{
+            System.out.println("Insert address");
+            String address = scanner.nextLine();
+            ObjectId newPOIId =POIConnector.createPOI(name,address,city);
+            if(newPOIId != null) {
+                if(CityConnector.addPOIToCity(cityOfPOI.getObjectId("_id"), newPOIId)){
+                    if(neoConnector.addPOI(name, newPOIId.toString())){
+                        System.out.println("The POI has been added");
                     }else{
+                        CityConnector.removePOIFromCity(cityOfPOI.getString("name"),newPOIId);
                         POIConnector.remove(newPOIId);
                         System.out.println("no poi added");
                     }
                 }else{
+                    POIConnector.remove(newPOIId);
                     System.out.println("no poi added");
                 }
+            }else{
+                System.out.println("no poi added");
             }
+            //}
         }
     }
 
