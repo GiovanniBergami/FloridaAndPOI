@@ -25,6 +25,7 @@ public class CityConnector {
         Document doc;
         doc =  new Document("name",name)
                 .append("POI_count",0)
+                .append("description","")
                 .append("POI_ids",new ArrayList<>());
         cities.insertOne(doc);
 
